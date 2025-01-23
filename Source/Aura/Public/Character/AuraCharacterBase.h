@@ -23,14 +23,13 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(EditAnywhere, Category= "Combat")
+
+	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<USkeletalMeshComponent> Weapon;
-	
+
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;
 
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet;
-
 };
