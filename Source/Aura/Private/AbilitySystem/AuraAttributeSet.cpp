@@ -38,7 +38,22 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 
 void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
-	Super::PreAttributeChange(Attribute, NewValue);
+	// Super::PreAttributeChange(Attribute, NewValue);
+	//
+	// if (Attribute == GetHealthAttribute())
+	// {
+	// 	NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+	// }
+	// if (Attribute == GetManaAttribute())
+	// {
+	// 	NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
+	// }
+
+}
+
+void UAuraAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
+{
+	Super::PreAttributeBaseChange(Attribute, NewValue);
 
 	if (Attribute == GetHealthAttribute())
 	{
@@ -48,7 +63,7 @@ void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, 
 	{
 		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
 	}
-
+	
 }
 
 void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
@@ -82,8 +97,6 @@ void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData
 		Props.TargetCharacter = Cast<ACharacter>(Props.TargetAvatarActor);
 		Props.TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Props.TargetAvatarActor);
 	}
-	
-	
 }
 
 void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data)
@@ -93,14 +106,14 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
 
-	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
-	{
-		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
-	}
-	if (Data.EvaluatedData.Attribute == GetManaAttribute())
-	{
-		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
-	}
+	// if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	// {
+	// 	SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	// }
+	// if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	// {
+	// 	SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	// }
 	
 }
 
