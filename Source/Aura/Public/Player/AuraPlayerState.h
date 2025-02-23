@@ -28,6 +28,8 @@ public:
 
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
 
+
+
 protected:
 	
 	UPROPERTY(VisibleAnywhere)
@@ -39,7 +41,7 @@ protected:
 private:
 
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Level)
-	int32 Level = 1;
+	int32 Level = 3;
 
 	UFUNCTION()
 	void OnRep_Level(int32 OldLevel);
