@@ -13,7 +13,6 @@ AAuraCharacterBase::AAuraCharacterBase()
 	Weapon->SetupAttachment(GetMesh(),FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
-
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -45,6 +44,7 @@ void AAuraCharacterBase::InitializeDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributes, 1.f);
 	ApplyEffectToSelf(DefaultSecondaryAttributes, 1.f);
+	ApplyEffectToSelf(DefaultVitalAttributes, 1.f);
 }
 
 
