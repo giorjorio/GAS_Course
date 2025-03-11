@@ -23,8 +23,26 @@ AAuraPlayerController::AAuraPlayerController()
 void AAuraPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
-
 	CursorTrace();
+	AutoRun();
+}
+
+
+void AAuraPlayerController::AutoRun()
+{
+	if (!bAutoRunning) return;
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
+		ControlledPawn->AddMovementInput(Direction);
+
+		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			bAutoRunning = false;
+		}
+	}
 }
 
 void AAuraPlayerController::CursorTrace()
@@ -167,7 +185,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 	else
 	{
 		APawn* ControlledPawn = GetPawn();
-		if (FollowTime <= ShortPressThreshold)
+		if (FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
 			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
 			{
@@ -176,12 +194,19 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				{
 					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
 					DrawDebugSphere(GetWorld(), PointLoc, 8.f, 8, FColor::Green, false, 5.f);
+				}
+				// So in the case where we would run off into the distance 
+				// is actually a case where we had no path points in the array.  
+				// So just check for that and only start running if we get at least one path point.
+				if (NavPath->PathPoints.Num() >0 )
+				{
+					CachedDestination = NavPath->PathPoints.Last();
 					bAutoRunning = true;
 				}
 			}
-			FollowTime = 0.f;
-			bTargeting = false;
 		}
+		FollowTime = 0.f;
+		bTargeting = false;
 	}
 }
 
