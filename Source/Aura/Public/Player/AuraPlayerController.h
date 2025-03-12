@@ -39,11 +39,14 @@ private:
 	/*
 	 * Highlight Enemies
 	 */
-	
+
+	FHitResult CursorHit;
+
 	void CursorTrace();
 	
 	TScriptInterface<IEnemyInterface> LastActor;
 	TScriptInterface<IEnemyInterface> ThisActor;
+
 	
 	/*
 	 * Movement
