@@ -121,6 +121,8 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 
 	FEffectProperties Props;
 	SetEffectProperties(Data, Props);
+	//UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *Props.TargetAvatarActor->GetName(),  GetHealth());
+	
 }
 
 
