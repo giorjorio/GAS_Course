@@ -114,27 +114,6 @@ public:
 
 	
 	/*
-	 * Vital Attributes
-	 */
-	
-	/* Health */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
-	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health);
-
-	UFUNCTION()
-	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
-
-	/* Mana */
-	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Vital Attributes")
-	FGameplayAttributeData Mana;
-	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
-
-	UFUNCTION()
-	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
-
-
-	/*
 	 * Secondary Attributes
 	 */
 
@@ -217,7 +196,36 @@ public:
 
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+
+
+	/*
+	* Vital Attributes
+	*/
 	
+	/* Health */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "Vital Attributes")
+	FGameplayAttributeData Health;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Health);
+
+	UFUNCTION()
+	void OnRep_Health(const FGameplayAttributeData& OldHealth) const;
+
+	/* Mana */
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Mana, Category = "Vital Attributes")
+	FGameplayAttributeData Mana;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, Mana);
+
+	UFUNCTION()
+	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
+
+
+	/*
+	 * Meta Attributes
+	 */
+
+	UPROPERTY(BlueprintReadOnly, Category = "Meta Attributes")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(UAuraAttributeSet, IncomingDamage);
 
 private:
 
