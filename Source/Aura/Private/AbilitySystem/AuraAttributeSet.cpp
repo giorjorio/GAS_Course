@@ -89,19 +89,20 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 	SetEffectProperties(Data, Props);
 	//UE_LOG(LogTemp, Warning, TEXT("Changed Health on %s, Health: %f"), *Props.TargetAvatarActor->GetName(),  GetHealth());
 
-	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	/*if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
 		const float LocalIncomingDamage = GetIncomingDamage();
 		SetIncomingDamage(0.f);
-
+	
 		if (LocalIncomingDamage > 0.f)
 		{
 			const float NewHealth = GetHealth() - LocalIncomingDamage;
 			SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
-
+	
 			const bool bFatal = NewHealth <= 0.f;
 		}
-	}
+	}*/
+	// We are doing the other way, Set By Caller way. Not with Damage as Attribute way
 }
 
 void UAuraAttributeSet::SetEffectProperties(const FGameplayEffectModCallbackData& Data, FEffectProperties& Props) const
