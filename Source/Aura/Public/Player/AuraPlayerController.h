@@ -7,8 +7,10 @@
 #include "GameFramework/PlayerController.h"
 #include "AuraPlayerController.generated.h"
 
+
 class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
+class UDamageTextComponent;
 class IEnemyInterface;
 class UInputAction;
 class UInputMappingContext;
@@ -28,7 +30,8 @@ public:
 	AAuraPlayerController();
 	virtual void PlayerTick(float DeltaTime) override;
 
-
+	UFUNCTION(Client, Reliable)
+	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter);
 
 protected:
 	virtual void BeginPlay() override;
@@ -46,7 +49,6 @@ private:
 	
 	TScriptInterface<IEnemyInterface> LastActor;
 	TScriptInterface<IEnemyInterface> ThisActor;
-
 	
 	/*
 	 * Movement
@@ -100,5 +102,12 @@ private:
 	TObjectPtr<USplineComponent> Spline;
 
 	void AutoRun();
+
+	/*
+	 * Show Damage Number
+	 */
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
 };
 
