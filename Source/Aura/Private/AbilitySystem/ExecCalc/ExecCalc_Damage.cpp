@@ -4,6 +4,7 @@
 #include "AbilitySystem/ExecCalc/ExecCalc_Damage.h"
 
 #include "AbilitySystemComponent.h"
+#include "AuraAbilityTypes.h"
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
@@ -72,6 +73,9 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// Get the effect specification, which contains data like tags and modifiers
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
 
+	// Creating EffectContextHandle
+	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
+
 	// Extract source and target tags for conditional calculations
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
@@ -94,9 +98,14 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// Try to calculate the current value of the target's Armor attribute
 	ExecutionParams.AttemptCalculateCapturedAttributeMagnitude(DamageStatics().BlockChanceDef, EvaluationParameters, TargetBlockChance);
 	TargetBlockChance = FMath::Max<float>(TargetBlockChance, 0.f);  // Ensure BlockChance is at least 0 to avoid negative values
+
+	// Determine whether Hit is blocked or not
+	const bool bBlocked = FMath::FRandRange(UE_SMALL_NUMBER, 100.0f) <= TargetBlockChance;
+
+	// Pass the information to EffectContextHandle whether Hit is blocked or not
+	UAuraAbilitySystemLibrary::SetIsBlockedHit(EffectContextHandle, bBlocked);
 	
 	// If Block, halve the damage.
-	const bool bBlocked = FMath::FRandRange(UE_SMALL_NUMBER, 100.0f) <= TargetBlockChance;
 	Damage = bBlocked ? Damage / 2.f : Damage; 
 
 	/*
@@ -152,8 +161,13 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 	// Critical Hit Resistance reduces a percentage of the Source's Critical Hit Chance.
 	const float EffectiveCriticalHitChance = SourceCriticalHitChance * (100 - TargetCriticalHitResistance * CriticalHitResistanceCoefficient) / 100.f;
 	
-	// If Critical, double the damage plus a bonus if critical hit.
+	// Check whether hit is Critical or not 
 	const bool bCritical = FMath::FRandRange(UE_SMALL_NUMBER, 100.0f) <= EffectiveCriticalHitChance;
+
+	// Pass the information to EffectContextHandle whether hit is Critical or not 
+	UAuraAbilitySystemLibrary::SetIsCriticalHit(EffectContextHandle, bCritical);
+
+	// Double the damage plus a bonus if critical hit.
 	Damage = bCritical ? Damage * 2.f + SourceCriticalHitDamage : Damage; 
 	
 	
