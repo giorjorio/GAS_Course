@@ -27,6 +27,8 @@ public:
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 	virtual void Die() override;
 
+
+	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
 
@@ -40,6 +42,8 @@ protected:
 	FName WeaponTipSocketName;
 
 	virtual FVector GetCombatSocketLocation() override;
+
+
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent;

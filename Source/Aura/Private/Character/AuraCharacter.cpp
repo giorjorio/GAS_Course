@@ -48,6 +48,8 @@ int32 AAuraCharacter::GetPlayerLevel()
 }
 
 
+
+
 void AAuraCharacter::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
 {
 	check(IsValid(GetAbilitySystemComponent()));

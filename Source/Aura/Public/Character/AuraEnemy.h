@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Character/AuraCharacterBase.h"
 #include "Interaction/EnemyInterface.h"
 #include "UI/WidgetController/OverlayWidgetController.h"
-#include "AbilitySystem/Data/CharacterClassInfo.h"
 
 #include "AuraEnemy.generated.h"
 
@@ -33,7 +33,7 @@ public:
 	virtual int32 GetPlayerLevel() override;
 	virtual void Die() override;
 	/* end Combat Interface */
-
+	
 	UPROPERTY(BlueprintAssignable)
 	FOnAttributeChangedSignature OnHealthChanged;
 

@@ -1,26 +1,32 @@
 // Giorjorio Copyright
 
 
-#include "AbilitySystem/ModMagCalc/MMC_MaxMana.h"
+#include "AbilitySystem/ModMagCalc/MMC_FireResistance.h"
 
+#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAttributeSet.h"
-#include "Interaction/CombatInterface.h"
 
-UMMC_MaxMana::UMMC_MaxMana()
+
+UMMC_FireResistance::UMMC_FireResistance()
 {
 	IntelligenceDef.AttributeToCapture = UAuraAttributeSet::GetIntelligenceAttribute();
 	IntelligenceDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
 	IntelligenceDef.bSnapshot = false;
-
+	
+	ResilienceDef.AttributeToCapture = UAuraAttributeSet::GetResilienceAttribute();
+	ResilienceDef.AttributeSource = EGameplayEffectAttributeCaptureSource::Target;
+	ResilienceDef.bSnapshot = false;
+	
 	RelevantAttributesToCapture.Add(IntelligenceDef);
+	RelevantAttributesToCapture.Add(ResilienceDef);
 }
 
-float UMMC_MaxMana::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
+float UMMC_FireResistance::CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const
 {
 	// Gather tags from source and target
 	const FGameplayTagContainer* SourceTags = Spec.CapturedSourceTags.GetAggregatedTags();
 	const FGameplayTagContainer* TargetTags = Spec.CapturedTargetTags.GetAggregatedTags();
-
+	
 	FAggregatorEvaluateParameters EvaluationParameters;
 	EvaluationParameters.SourceTags = SourceTags;
 	EvaluationParameters.TargetTags = TargetTags;
@@ -29,8 +35,10 @@ float UMMC_MaxMana::CalculateBaseMagnitude_Implementation(const FGameplayEffectS
 	GetCapturedAttributeMagnitude(IntelligenceDef, Spec, EvaluationParameters, Intelligence);
 	Intelligence = FMath::Max<float>(Intelligence, 0.0f);
 
-	ICombatInterface* CombatInterface = Cast<ICombatInterface>(Spec.GetContext().GetSourceObject());
-	const int32 PlayerLevel = CombatInterface->GetPlayerLevel();
-
-	return Intelligence * 10.f + PlayerLevel * 10.f - 30.f;
+	float Resilience = 0.f;
+	GetCapturedAttributeMagnitude(ResilienceDef, Spec, EvaluationParameters, Resilience);
+	Resilience = FMath::Max<float>(Resilience, 0.0f);
+	
+	return ((Resilience * 2.f + Intelligence * 0.5f ) * 0.5f) + 0.75f;
+	
 }

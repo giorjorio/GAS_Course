@@ -40,7 +40,7 @@ protected:
 
 private:
 
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Level)
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Level)
 	int32 Level = 1;
 
 	UFUNCTION()

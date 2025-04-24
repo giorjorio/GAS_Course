@@ -108,6 +108,7 @@ int32 AAuraEnemy::GetPlayerLevel()
 	return Level;
 }
 
+
 void AAuraEnemy::Die()
 {
 	SetLifeSpan(LifeSpan);
