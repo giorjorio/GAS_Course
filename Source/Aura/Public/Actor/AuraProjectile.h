@@ -50,7 +50,12 @@ private:
 	TObjectPtr<USoundBase> ImpactSound;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UAudioComponent> LoopingSound;
+	TObjectPtr<USoundBase> LoopingSound;
+
+	UPROPERTY()
+	TObjectPtr<UAudioComponent> LoopingSoundComponent;
+
+	void ExecuteImpactEffects() const;
 
 
 
