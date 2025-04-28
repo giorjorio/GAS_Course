@@ -24,6 +24,9 @@ void AAuraEffectActor::BeginPlay()
 
 void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass)
 {
+	// Do not apply effect if actor is an enemy
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	/* Traditional way to get something from actor 
 	IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(Target);
 	if (ASCInterface)
@@ -31,9 +34,7 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 	 	ASCInterface->GetAbilitySystemComponent();
 	}
 	*/
-
 	/* GAS way to get AbilitySystemComponent, more sophisticated */
-	
 	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	if (TargetASC == nullptr) return;
 	
@@ -49,11 +50,20 @@ void AAuraEffectActor::ApplyEffectToTarget(AActor* TargetActor, TSubclassOf<UGam
 	{
 		ActiveEffectHandles.Add(ActiveEffectHandle, TargetASC);
 	}
+
+	if (bDestroyOnEffectApplication && !bIsInfinite)
+	{
+		Destroy();
+	}
+	
 	
 }
 
 void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 {
+	// Do not apply effect if actor is an enemy
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
@@ -70,6 +80,9 @@ void AAuraEffectActor::OnOverlap(AActor* TargetActor)
 
 void AAuraEffectActor::OnEndOverlap(AActor* TargetActor)
 {
+	// Do not apply effect if actor is an enemy
+	if (TargetActor->ActorHasTag(FName("Enemy")) && !bApplyEffectsToEnemies) return;
+	
 	if (InstantEffectApplicationPolicy == EEffectApplicationPolicy::ApplyOnEndOverlap)
 	{
 		ApplyEffectToTarget(TargetActor, InstantGameplayEffectClass);
