@@ -52,6 +52,9 @@ public:
 	/* Effect Tags */
 	FGameplayTag Effects_HitReact;
 
+	/* Ability Tags */
+	FGameplayTag Abilities_Attack;
+
 	/* Input Tags */
 	FGameplayTag InputTag_LMB;
 	FGameplayTag InputTag_RMB;
