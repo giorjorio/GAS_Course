@@ -17,6 +17,8 @@ class AURA_API UAuraDamageGameplayAbility : public UAuraGameplayAbility
 	
 public:
 
+	UFUNCTION(BlueprintCallable)
+	void CauseDamage(AActor* TargetActor);
 	
 protected:
 	
