@@ -56,6 +56,7 @@ void AAuraProjectile::Destroyed()
 	if (!bHit && !HasAuthority())
 	{
 		ExecuteImpactEffects();
+		bHit = true;
 	}
 	
 	Super::Destroyed();
@@ -75,6 +76,7 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	if (!bHit)
 	{
 		ExecuteImpactEffects();
+		bHit = true;
 	}
 	
 	if (HasAuthority())
