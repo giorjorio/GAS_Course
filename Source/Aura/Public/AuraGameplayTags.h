@@ -51,6 +51,7 @@ public:
 
 	/* Ability Tags */
 	FGameplayTag Abilities_Attack;
+	FGameplayTag Abilities_Summon;
 	
 	/* Effect Tags */
 	FGameplayTag Effects_HitReact;
