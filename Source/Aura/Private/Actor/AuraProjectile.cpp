@@ -96,6 +96,7 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 
 void AAuraProjectile::ExecuteImpactEffects() const
 {
+	UE_LOG(LogTemp, Display, TEXT("[%s] spawned"), *GetName());
 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
 }

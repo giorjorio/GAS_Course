@@ -13,6 +13,7 @@ TArray<FVector> UAuraSummonAbility::GetSpawnLocations()
 	ICombatInterface* CombatInterface = Cast<ICombatInterface>(GetAvatarActorFromActorInfo());
 	if (!CombatInterface) return TArray<FVector>();
 
+	// Waiting for the OnDeathDelegate to work perfect
 	int32 CurrentMinions = CombatInterface->Execute_GetMinionCount(GetAvatarActorFromActorInfo());
 	const float DeltaSpread = SpawnSpread / (NumMinions - CurrentMinions);
 
