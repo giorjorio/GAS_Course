@@ -23,6 +23,29 @@ AAuraPlayerController::AAuraPlayerController()
 	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 }
 
+void AAuraPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	check(AuraContext);
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	if (Subsystem)
+	{
+		Subsystem->AddMappingContext(AuraContext, 0);
+	}
+	
+	bShowMouseCursor = true;
+	DefaultMouseCursor = EMouseCursor::Default;
+
+	FInputModeGameAndUI InputModeData;
+	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	InputModeData.SetHideCursorDuringCapture(false);
+	SetInputMode(InputModeData);
+
+	NavSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	
+}
+
 void AAuraPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -41,6 +64,7 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, 
 		DamageText->SetDamageText(DamageAmount, bBlockedHit, bCriticalHit);
 	}
 }
+
 
 
 void AAuraPlayerController::AutoRun()
@@ -73,27 +97,6 @@ void AAuraPlayerController::CursorTrace()
 		if (LastActor) LastActor->UnHighlightActor();
 		if (ThisActor) ThisActor->HighlightActor();
 	}
-}
-
-void AAuraPlayerController::BeginPlay()
-{
-	Super::BeginPlay();
-	check(AuraContext);
-
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	if (Subsystem)
-	{
-		Subsystem->AddMappingContext(AuraContext, 0);
-	}
-	
-	bShowMouseCursor = true;
-	DefaultMouseCursor = EMouseCursor::Default;
-
-	FInputModeGameAndUI InputModeData;
-	InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	InputModeData.SetHideCursorDuringCapture(false);
-	SetInputMode(InputModeData);
-	
 }
 
 /*
@@ -140,6 +143,7 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
+	
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
@@ -159,23 +163,25 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	else
 	{
 		FollowTime += GetWorld()->GetDeltaSeconds();
-
-		
-		if (CursorHit.bBlockingHit)
+		if (FollowTime >= WaitToHeldToMove)
 		{
-			CachedDestination = CursorHit.ImpactPoint;
-		}
+			if (CursorHit.bBlockingHit)
+			{
+				CachedDestination = CursorHit.ImpactPoint;
+			}
 
-		if (APawn* ControlledPawn = GetPawn())
-		{
-			const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-			ControlledPawn->AddMovementInput(WorldDirection);
+			if (APawn* ControlledPawn = GetPawn())
+			{
+				const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
+				ControlledPawn->AddMovementInput(WorldDirection);
+			}
 		}
 	}
 }
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
+	
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
@@ -199,21 +205,38 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			GetHitResultUnderCursor(ECC_Navigation, false, NavChannelCursorHitResult);
 			if (NavChannelCursorHitResult.bBlockingHit)
 			{
-				if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), NavChannelCursorHitResult.ImpactPoint))
+				// Projecting a point from the cursor impact point to the NavMesh with a larger-than-default
+				// Query Extent, so there are better chances to reach for the NavMesh and return a point,
+				// then generating a path from the pawn location to this point (only if found).
+
+				FNavLocation ImpactPointNavLocation;
+				// NOTE: Default Query Extend = FVector(50.0f, 50.0f, 250.0f)
+				const FNavAgentProperties& NavAgentProps = GetNavAgentPropertiesRef();
+				const bool bNavLocationFound = NavSystem->ProjectPointToNavigation(NavChannelCursorHitResult.ImpactPoint, ImpactPointNavLocation, QueryingExtend, &NavAgentProps);
+
+				if (bNavLocationFound)
 				{
-					Spline->ClearSplinePoints();
-					for (const FVector& PointLoc : NavPath->PathPoints)
+					UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), ImpactPointNavLocation);
+					if (NavPath && NavPath->PathPoints.Num() > 0)
 					{
-						Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-					}
-					// So in the case where we would run off into the distance 
-					// is actually a case where we had no path points in the array.  
-					// So just check for that and only start running if we get at least one path point.
-					if (NavPath->PathPoints.Num() > 0)
-					{
+						// So in the case where we would run off into the distance 
+						// is actually a case where we had no path points in the array.  
+						// So just check for that and only start running if we get at least one path point.
+						
+						Spline->ClearSplinePoints();
+						for (const FVector& PointLoc : NavPath->PathPoints)
+						{
+							Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+						}
+						
 						CachedDestination = NavPath->PathPoints.Last();
 						bAutoRunning = true;
 					}
+				}
+				if (bDrawDebugEnabled)
+				{
+					DrawDebugBox(GetWorld(), NavChannelCursorHitResult.ImpactPoint, QueryingExtend, FColor::Silver, false, 3.0f);
+					DrawDebugSphere(GetWorld(), CachedDestination, 20.f, 12, FColor::Yellow, false, 3.0f);
 				}
 			}
 		}

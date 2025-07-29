@@ -14,6 +14,7 @@ class UDamageTextComponent;
 class IEnemyInterface;
 class UInputAction;
 class UInputMappingContext;
+class UNavigationSystemV1;
 class USplineComponent;
 struct FInputActionValue;
 
@@ -92,14 +93,26 @@ private:
 	FVector CachedDestination = FVector::ZeroVector;
 	float FollowTime = 0.f;
 	float ShortPressThreshold = 0.5f;
+	float WaitToHeldToMove = 0.3f;
 	bool bAutoRunning = false;
 	bool bTargeting = false;
 
-	UPROPERTY(EditDefaultsOnly)
+	
+
+	UPROPERTY(EditDefaultsOnly, Category = "Click-To-Move")
 	float AutoRunAcceptanceRadius = 50.f;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, Category = "Click-To-Move")
 	TObjectPtr<USplineComponent> Spline;
+
+	UPROPERTY()
+	TObjectPtr<UNavigationSystemV1> NavSystem;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Click-To-Move")
+	FVector QueryingExtend = FVector(400.f, 400.f, 250.f);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Click-To-Move")
+	bool bDrawDebugEnabled = false;
 
 	void AutoRun();
 
