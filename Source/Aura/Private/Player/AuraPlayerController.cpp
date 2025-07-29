@@ -12,6 +12,7 @@
 #include "Interaction/EnemyInterface.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "Aura/Aura.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 
@@ -194,20 +195,25 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 		const APawn* ControlledPawn = GetPawn();
 		if (FollowTime <= ShortPressThreshold && ControlledPawn)
 		{
-			if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination))
+			FHitResult NavChannelCursorHitResult;
+			GetHitResultUnderCursor(ECC_Navigation, false, NavChannelCursorHitResult);
+			if (NavChannelCursorHitResult.bBlockingHit)
 			{
-				Spline->ClearSplinePoints();
-				for (const FVector& PointLoc : NavPath->PathPoints)
+				if (UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), NavChannelCursorHitResult.ImpactPoint))
 				{
-					Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
-				}
-				// So in the case where we would run off into the distance 
-				// is actually a case where we had no path points in the array.  
-				// So just check for that and only start running if we get at least one path point.
-				if (NavPath->PathPoints.Num() > 0)
-				{
-					CachedDestination = NavPath->PathPoints.Last();
-					bAutoRunning = true;
+					Spline->ClearSplinePoints();
+					for (const FVector& PointLoc : NavPath->PathPoints)
+					{
+						Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
+					}
+					// So in the case where we would run off into the distance 
+					// is actually a case where we had no path points in the array.  
+					// So just check for that and only start running if we get at least one path point.
+					if (NavPath->PathPoints.Num() > 0)
+					{
+						CachedDestination = NavPath->PathPoints.Last();
+						bAutoRunning = true;
+					}
 				}
 			}
 		}
