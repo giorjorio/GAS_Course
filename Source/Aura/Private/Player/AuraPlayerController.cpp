@@ -4,15 +4,16 @@
 
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Aura/Aura.h"
 #include "AuraGameplayTags.h"
 #include "Components/SplineComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Character.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
+#include "Kismet/GameplayStatics.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
-#include "Aura/Aura.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 
@@ -67,22 +68,6 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, 
 
 
 
-void AAuraPlayerController::AutoRun()
-{
-	if (!bAutoRunning) return;
-	if (APawn* ControlledPawn = GetPawn())
-	{
-		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
-		const FVector Direction = Spline->FindDirectionClosestToWorldLocation(LocationOnSpline, ESplineCoordinateSpace::World);
-		ControlledPawn->AddMovementInput(Direction);
-
-		const float DistanceToDestination = (LocationOnSpline - CachedDestination).Length();
-		if (DistanceToDestination <= AutoRunAcceptanceRadius)
-		{
-			bAutoRunning = false;
-		}
-	}
-}
 
 void AAuraPlayerController::CursorTrace()
 {
@@ -126,9 +111,65 @@ void AAuraPlayerController::Move(const FInputActionValue& InputActionValue)
 
 	if  (APawn* ControlledPawn = GetPawn<APawn>())
 	{
+		bAutoRunning = false;
 		ControlledPawn->AddMovementInput(ForwardDirection, InputAxisVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputAxisVector.X);
 	}
+}
+
+void AAuraPlayerController::AutoRun()
+{
+	if (!bAutoRunning) return;
+	
+	if (APawn* ControlledPawn = GetPawn())
+	{
+		const FVector PawnLocation = ControlledPawn->GetActorLocation();
+		const FVector LocationOnSpline = Spline->FindLocationClosestToWorldLocation(PawnLocation, ESplineCoordinateSpace::World);
+		const FVector TargetSplinePointLocation = Spline->GetLocationAtSplinePoint(TargetSplinePointIdx,ESplineCoordinateSpace::World);
+		FVector WorldDirection = TargetSplinePointLocation - PawnLocation;
+		WorldDirection.Z = 0.f;
+		//	NOTE: We get the normal after zeroing Z to get a constant movement speed along the XY plane.
+		WorldDirection = WorldDirection.GetSafeNormal();
+		ControlledPawn->AddMovementInput(WorldDirection);
+
+		const float DistanceToDestination = (LocationOnSpline - TargetSplinePointLocation).Length();
+		if (DistanceToDestination <= AutoRunAcceptanceRadius)
+		{
+			const bool bNextTargetPointExist = TargetSplinePointIdx < Spline->GetNumberOfSplinePoints() - 1;
+			if (bNextTargetPointExist)
+			{
+				TargetSplinePointIdx++;
+			}
+			else
+			{
+				bAutoRunning = false;
+			}
+		}
+		if (bDrawDebugEnabled)
+		{
+			for (int32 SplinePointIdx = 0; SplinePointIdx < Spline->GetNumberOfSplinePoints(); ++SplinePointIdx)
+			{
+				const FVector SplinePointLocation = Spline->GetLocationAtSplinePoint(SplinePointIdx,ESplineCoordinateSpace::World);
+				if (SplinePointIdx > 0)
+				{
+					const FVector PreviousSplinePointLocation = Spline->GetLocationAtSplinePoint(SplinePointIdx - 1, ESplineCoordinateSpace::World);
+					DrawDebugLine(GetWorld(), PreviousSplinePointLocation, SplinePointLocation, FColor::Red);
+				}
+				DrawDebugSphere(GetWorld(), SplinePointLocation, 10.f, 12, FColor::Red);
+			}
+			DrawDebugSphere(GetWorld(), LocationOnSpline, 20.f, 12, FColor::Cyan);
+
+			const FVector LineStart = PawnLocation + WorldDirection.GetSafeNormal() * 50.f;
+			const FVector LineEnd = LineStart + WorldDirection * 100.f;
+			UKismetSystemLibrary::DrawDebugArrow(this, LineStart, LineEnd, 20.f, FLinearColor::Yellow, 0.f, 4.f);
+
+			DrawDebugSphere(GetWorld(), TargetSplinePointLocation, 20.f, 12, FColor::Yellow);
+
+			UE_LOG(LogTemp, Warning, TEXT("TargetSplinePointIdx: %i, DistanceToDestination: %f"), TargetSplinePointIdx, DistanceToDestination);
+		}
+	}
+
+	
 }
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
@@ -136,14 +177,11 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		bTargeting = ThisActor ? true : false;
-		bAutoRunning = false;
 	}
 }
 
-
 void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 {
-	
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
@@ -165,6 +203,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		FollowTime += GetWorld()->GetDeltaSeconds();
 		if (FollowTime >= WaitToHeldToMove)
 		{
+			bAutoRunning = false;
 			if (CursorHit.bBlockingHit)
 			{
 				CachedDestination = CursorHit.ImpactPoint;
@@ -181,7 +220,6 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 
 void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 {
-	
 	if (!InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		if (GetASC())
@@ -229,7 +267,8 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 							Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
 						}
 						
-						CachedDestination = NavPath->PathPoints.Last();
+						//CachedDestination = NavPath->PathPoints.Last();
+						TargetSplinePointIdx = 1;
 						bAutoRunning = true;
 					}
 				}

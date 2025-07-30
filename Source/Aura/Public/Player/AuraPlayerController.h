@@ -89,16 +89,15 @@ private:
 	/*
 	 * Click to Move
 	 */
-	
 	FVector CachedDestination = FVector::ZeroVector;
+	bool bAutoRunning = false;
+	bool bTargeting = false;
 	float FollowTime = 0.f;
 	float ShortPressThreshold = 0.5f;
 	float WaitToHeldToMove = 0.3f;
-	bool bAutoRunning = false;
-	bool bTargeting = false;
+	int32 TargetSplinePointIdx = 0;
 
 	
-
 	UPROPERTY(EditDefaultsOnly, Category = "Click-To-Move")
 	float AutoRunAcceptanceRadius = 50.f;
 
