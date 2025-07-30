@@ -9,11 +9,13 @@
 #include "Components/SplineComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/HUD.h"
 #include "Input/AuraInputComponent.h"
 #include "Interaction/EnemyInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "Interaction/CombatInterface.h"
 #include "UI/Widget/DamageTextComponent.h"
 
 
@@ -174,6 +176,7 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		bTargeting = ThisActor ? true : false;
+		ControlledPawnHalfHeight = Cast<ICombatInterface>(GetPawn())->GetHalfHeight();
 	}
 }
 
@@ -201,15 +204,27 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 		if (FollowTime >= WaitToHeldToMove)
 		{
 			bAutoRunning = false;
-			if (CursorHit.bBlockingHit)
-			{
-				CachedDestination = CursorHit.ImpactPoint;
-			}
-
 			if (APawn* ControlledPawn = GetPawn())
 			{
-				const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal();
-				ControlledPawn->AddMovementInput(WorldDirection);
+				const FVector PawnLocation = ControlledPawn->GetActorLocation();
+				FVector PawnBottomLocation = PawnLocation;
+				PawnBottomLocation.Z -= ControlledPawnHalfHeight;
+				FVector CursorHorizPlaneIntersection;
+				const bool bIntersectionFound = GetCursorPlaneIntersection(PawnBottomLocation, FVector::UpVector, CursorHorizPlaneIntersection);
+				if (bIntersectionFound)
+				{
+					FVector WorldDirection = (CursorHorizPlaneIntersection - PawnLocation).GetSafeNormal();
+					WorldDirection.Z = 0.f;
+					ControlledPawn->AddMovementInput(WorldDirection);
+
+					if (bDrawDebugEnabled)
+					{
+						DrawDebugSphere(GetWorld(), CursorHorizPlaneIntersection, 20.f, 12, FColor::Green);
+						const FVector LineStart = PawnLocation + WorldDirection.GetSafeNormal() * 50.f;
+						const FVector LineEnd = LineStart + WorldDirection * 100.f;
+						UKismetSystemLibrary::DrawDebugArrow(this, LineStart, LineEnd, 20.f, FLinearColor::Green, 0.f, 4.f);
+					}
+				}
 			}
 		}
 	}
@@ -264,7 +279,6 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 							Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
 						}
 						
-						//CachedDestination = NavPath->PathPoints.Last();
 						TargetSplinePointIdx = 1;
 						bAutoRunning = true;
 					}
@@ -289,4 +303,41 @@ UAuraAbilitySystemComponent* AAuraPlayerController::GetASC()
 			UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn<APawn>()));
 	}
 	return AuraAbilitySystemComponent;
+}
+
+bool AAuraPlayerController::GetCursorPlaneIntersection(const FVector& InPlaneOrigin, const FVector& InPlaneNormal,
+	FVector& OutPlanePoint) const
+{
+	ULocalPlayer* LocalPlayer = Cast<ULocalPlayer>(Player);
+	if (LocalPlayer && LocalPlayer->ViewportClient)
+	{
+		FVector2D MousePosition;
+		const bool bMousePositionFound = LocalPlayer->ViewportClient->GetMousePosition(MousePosition);
+		if (bMousePositionFound)
+		{
+			return GetScreenPositionPlaneIntersection(MousePosition, InPlaneOrigin, InPlaneNormal, OutPlanePoint);
+		}
+	}
+	return false;
+}
+
+bool AAuraPlayerController::GetScreenPositionPlaneIntersection(const FVector2d& ScreenPosition,
+	const FVector& InPlaneOrigin, const FVector& InPlaneNormal, FVector& OutPlanePoint) const
+{
+	// Early out if we clicked on a HUD hitbox.
+	AHUD* HUD = GetHUD();
+	if (HUD && HUD->GetHitBoxAtCoordinates(ScreenPosition, true))
+	{
+		return false;
+	}
+
+	FVector WorldOrigin;
+	FVector WorldDirection;
+	const bool bScreenPositionDeprojected = UGameplayStatics::DeprojectScreenToWorld(this, ScreenPosition, WorldOrigin, WorldDirection);
+	if (bScreenPositionDeprojected)
+	{
+		OutPlanePoint = FMath::LinePlaneIntersection(WorldOrigin, WorldOrigin + WorldDirection * HitResultTraceDistance, InPlaneOrigin, InPlaneNormal);
+		return true;
+	}
+	return false;
 }

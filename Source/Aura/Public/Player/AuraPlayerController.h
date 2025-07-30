@@ -89,9 +89,12 @@ private:
 	/*
 	 * Click to Move
 	 */
-	FVector CachedDestination = FVector::ZeroVector;
+	bool GetCursorPlaneIntersection(const FVector& InPlaneOrigin, const FVector& InPlaneNormal, FVector& OutPlanePoint) const;
+	bool GetScreenPositionPlaneIntersection(const FVector2d& ScreenPosition, const FVector& InPlaneOrigin, const FVector& InPlaneNormal, FVector& OutPlanePoint) const;
+	
 	bool bAutoRunning = false;
 	bool bTargeting = false;
+	float ControlledPawnHalfHeight = 0.0f;
 	float FollowTime = 0.f;
 	float ShortPressThreshold = 0.5f;
 	float WaitToHeldToMove = 0.3f;
