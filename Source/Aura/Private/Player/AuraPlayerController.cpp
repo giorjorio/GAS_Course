@@ -66,9 +66,6 @@ void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, 
 	}
 }
 
-
-
-
 void AAuraPlayerController::CursorTrace()
 {
 	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
@@ -275,7 +272,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				if (bDrawDebugEnabled)
 				{
 					DrawDebugBox(GetWorld(), NavChannelCursorHitResult.ImpactPoint, QueryingExtend, FColor::Silver, false, 3.0f);
-					DrawDebugSphere(GetWorld(), CachedDestination, 20.f, 12, FColor::Yellow, false, 3.0f);
+					DrawDebugSphere(GetWorld(), ImpactPointNavLocation, 20.f, 12, FColor::Yellow, false, 3.0f);
 				}
 			}
 		}
