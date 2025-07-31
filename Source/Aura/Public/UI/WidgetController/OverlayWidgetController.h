@@ -10,6 +10,7 @@
 
 
 class UAbilityInfo;
+class UAuraAbilitySystemComponent;
 struct FOnAttributeChangeData;
 
 USTRUCT(BlueprintType)
@@ -71,9 +72,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widget Data")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
 	
-
 	template<typename T>
 	T* GetDataTableRowByTag(UDataTable* DataTable, const FGameplayTag& Tag);
+
+	void OnInitializeStartupAbilities(UAuraAbilitySystemComponent* AuraAbilitySystemComponent);
+	
 	
 };
 
