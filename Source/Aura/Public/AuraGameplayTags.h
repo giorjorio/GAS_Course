@@ -50,6 +50,7 @@ public:
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
 
 	/* Ability Tags */
+	FGameplayTag Abilities;
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
 	FGameplayTag Abilities_Fire_Firebolt;
@@ -70,6 +71,7 @@ public:
 	FGameplayTag Montage_Attack_4;
 
 	/* Input Tags */
+	FGameplayTag InputTag;
 	FGameplayTag InputTag_LMB;
 	FGameplayTag InputTag_RMB;
 	FGameplayTag InputTag_1;

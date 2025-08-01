@@ -100,6 +100,8 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Ability Tags
 	 */
+	GameplayTags.Abilities = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities"), FString("Parent Ability Tag"));
 	GameplayTags.Abilities_Attack = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Attack"), FString("Attack Ability Tag"));
 	GameplayTags.Abilities_Summon = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -141,21 +143,18 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	/*
 	 * Input Tags
 	 */
+	GameplayTags.InputTag = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("InputTag"), FString("Parent Input Tag"));
 	GameplayTags.InputTag_LMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.LMB"), FString("Input Tag for Left Mouse Button"));
-
 	GameplayTags.InputTag_RMB = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.RMB"), FString("Input Tag for Right Mouse Button"));
-
 	GameplayTags.InputTag_1 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.1"), FString("Input Tag for 1 key"));
-
 	GameplayTags.InputTag_2 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.2"), FString("Input Tag for 2 key"));
-
 	GameplayTags.InputTag_3 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.3"), FString("Input Tag for 3 key"));
-
 	GameplayTags.InputTag_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("InputTag.4"), FString("Input Tag for 4 key"));
 
