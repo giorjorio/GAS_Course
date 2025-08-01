@@ -65,7 +65,7 @@ public:
 	FMessageWidgetRowSignature MessageWidgetRow;
 
 	UPROPERTY(BlueprintAssignable, Category = "GAS|Messages")
-	FAbilityInfoSignature FAbilityInfoDelegate;
+	FAbilityInfoSignature AbilityInfoDelegate;
 
 
 protected:
