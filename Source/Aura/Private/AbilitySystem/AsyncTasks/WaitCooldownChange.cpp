@@ -13,6 +13,10 @@ UWaitCooldownChange* UWaitCooldownChange::WaitForCooldownChange(UAbilitySystemCo
 	WaitCooldownChange->ASC = AbilitySystemComponent;
 	WaitCooldownChange->CooldownTag = InCooldownTag;
 
+	// Calling EndTask() from WaitForCooldownChange() is unnecessary,
+	// we can simply return early before calling NewObject(),
+	// so no instance of this task class is created, i.e. add this line to the top of the function
+	// But I think Stephen showed this for educational reason
 	if (!IsValid(AbilitySystemComponent) || !InCooldownTag.IsValid())
 	{
 		WaitCooldownChange->EndTask();
@@ -36,6 +40,7 @@ void UWaitCooldownChange::EndTask()
 {
 	if (IsValid(ASC)) return;
 	ASC->RegisterGameplayTagEvent(CooldownTag, EGameplayTagEventType::NewOrRemoved).RemoveAll(this);
+	ASC->OnActiveGameplayEffectAddedDelegateToSelf.RemoveAll(this);
 
 	SetReadyToDestroy();
 	MarkAsGarbage();
@@ -62,6 +67,9 @@ void UWaitCooldownChange::OnActiveEffectAdded(UAbilitySystemComponent* TargetASC
 	{
 		FGameplayEffectQuery GameplayEffectQuery = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(CooldownTag.GetSingleTagContainer());
 		TArray<float> TimesRemaining = ASC->GetActiveEffectsTimeRemaining(GameplayEffectQuery);
+
+
+		//Or we could do FMath::Max(TimesRemaining);
 		if (TimesRemaining.Num() > 0)
 		{
 			float TimeRemaining = TimesRemaining[0];
