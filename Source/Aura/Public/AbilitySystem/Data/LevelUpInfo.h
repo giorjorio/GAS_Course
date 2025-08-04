@@ -34,6 +34,6 @@ class AURA_API ULevelUpInfo : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "LevelUp Information");
 	TArray<FAuraLevelUpInfo> LevelUpInformation;
-
-	int32 FindLevelForXp(int32 XP);
+	
+	int32 FindLevelForXp(int32 XP) const;
 };
