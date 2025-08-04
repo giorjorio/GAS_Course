@@ -8,6 +8,7 @@
 
 #include "CombatInterface.generated.h"
 
+enum class ECharacterClass : uint8;
 class UAnimMontage;
 class UNiagaraSystem;
 
@@ -87,5 +88,8 @@ public:
 	void DecrementMinionCount(int32 Amount);
 
 	FORCEINLINE virtual float GetHalfHeight() const { return 0.f; }
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	ECharacterClass GetCharacterClass();
 
 };
