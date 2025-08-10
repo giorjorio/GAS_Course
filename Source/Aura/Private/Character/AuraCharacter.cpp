@@ -58,54 +58,11 @@ int32 AAuraCharacter::GetXP_Implementation() const
 	return AuraPlayerState->GetPlayerXP();
 }
 
-int32 AAuraCharacter::GetAttributePointsReward_Implementation(int32 Level) const
-{
-	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);
-	return AuraPlayerState->LevelUpInfo->LevelUpInformation[Level].AttributePointReward;
-}
-
-int32 AAuraCharacter::GetSpellPointsReward_Implementation(int32 Level) const
-{
-	const AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);
-	return AuraPlayerState->LevelUpInfo->LevelUpInformation[Level].SpellPointReward;
-}
-
 void AAuraCharacter::AddToXP_Implementation(int32 InXP)
 {
 	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
 	check(AuraPlayerState);
 	AuraPlayerState->AddToXP(InXP);
-}
-
-void AAuraCharacter::AddToPlayerLevel_Implementation(int32 InPlayerLevel)
-{
-	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);
-	AuraPlayerState->AddToLevel(InPlayerLevel);
-}
-
-void AAuraCharacter::AddToAttributePoints_Implementation(int32 InAttributePoints)
-{
-	// TODO: Add AttributePoints to PlayerState
-}
-
-void AAuraCharacter::AddToSpellPoints_Implementation(int32 InSpellPoints)
-{
-	// TODO: Add SpellPoints to PlayerState
-}
-
-void AAuraCharacter::LevelUp_Implementation()
-{
-	
-}
-
-int32 AAuraCharacter::FindLevelForXP_Implementation(int32 InXP) const
-{
-	AAuraPlayerState* AuraPlayerState = GetPlayerState<AAuraPlayerState>();
-	check(AuraPlayerState);
-	return AuraPlayerState->LevelUpInfo->FindLevelForXp(InXP);
 }
 
 void AAuraCharacter::ApplyEffectToSelf(TSubclassOf<UGameplayEffect> GameplayEffectClass, float Level) const
@@ -143,5 +100,10 @@ void AAuraCharacter::InitAbilityActorInfo()
 		}
 	}
 	InitializeDefaultAttributes();
+
+	AuraPlayerState->OnLevelChangedDelegate.AddLambda([this](const int32 NewValue)
+	{
+		//Multicast_ExecuteLevelUpVFX();
+	});
 }
 

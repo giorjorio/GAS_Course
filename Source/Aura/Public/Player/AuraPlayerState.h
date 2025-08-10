@@ -46,7 +46,7 @@ public:
 	void SetXP(int32 InXP);
 	
 	void AddToLevel(int32 InLevel);
-	void AddToXP(int32 InXP);
+	void AddToXP(const int32 InXP);
 	
 
 
@@ -61,6 +61,12 @@ protected:
 
 private:
 
+	/*
+	 * Leveling Up
+	 */
+	void AddToAttributePoints(int32 InAttributePoints);
+	void AddToSpellPoints(int32 InSpellPoints);
+	
 	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_Level)
 	int32 Level = 1;
 
@@ -74,4 +80,7 @@ private:
 	void OnRep_XP(int32 OldXP);
 
 	
+
+	
 };
+
