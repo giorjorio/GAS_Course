@@ -33,7 +33,7 @@ public:
 	virtual void AddToXP_Implementation(int32 InXP) override;
 	/* end Player Interface */
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
 	
 protected:
@@ -57,6 +57,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USpringArmComponent> CameraBoom;
+
+	UPROPERTY(EditAnywhere, Category = "Level")
+	TObjectPtr<USoundBase> LevelUpSound;
 	
 	
 	virtual void InitAbilityActorInfo() override;

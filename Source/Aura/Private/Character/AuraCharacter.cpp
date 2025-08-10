@@ -6,10 +6,11 @@
 #include "AbilitySystemComponent.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "NiagaraComponent.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/HUD/AuraHUD.h"
@@ -85,11 +86,12 @@ void AAuraCharacter::Multicast_LevelUpVFX_Implementation() const
 {
 	if (IsValid(LevelUpNiagaraComponent))
 	{
-		const FVector CameraLocation = TopDownCameraComponent->GetComponentLocation();
-		const FVector NiagaraSystemLocation = LevelUpNiagaraComponent->GetComponentLocation();
-		const FRotator ToCameraRotation = (CameraLocation - NiagaraSystemLocation).Rotation();
-		LevelUpNiagaraComponent->SetWorldRotation(ToCameraRotation);
+		// const FVector CameraLocation = TopDownCameraComponent->GetComponentLocation();
+		// const FVector NiagaraSystemLocation = LevelUpNiagaraComponent->GetComponentLocation();
+		// const FRotator ToCameraRotation = (CameraLocation - NiagaraSystemLocation).Rotation();
+		// LevelUpNiagaraComponent->SetWorldRotation(ToCameraRotation);
 		LevelUpNiagaraComponent->Activate(true);
+		UGameplayStatics::PlaySoundAtLocation(this, LevelUpSound, GetActorLocation());
 	}
 }
 

@@ -69,19 +69,19 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation()
 FVector AAuraCharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag& MontageTag)
 {
 	const FAuraGameplayTags& GameplayTags = FAuraGameplayTags::Get();
-	if (MontageTag.MatchesTagExact(FAuraGameplayTags::Get().CombatSocket_Weapon) && IsValid(Weapon))
+	if (MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Weapon) && IsValid(Weapon))
 	{
 		return Weapon->GetSocketLocation(WeaponTipSocketName);
 	}
-	if (MontageTag.MatchesTagExact(FAuraGameplayTags::Get().CombatSocket_LeftHand))
+	if (MontageTag.MatchesTagExact(GameplayTags.CombatSocket_LeftHand))
 	{
 		return GetMesh()->GetSocketLocation(LeftHandSocketName);
 	}
-	if (MontageTag.MatchesTagExact(FAuraGameplayTags::Get().CombatSocket_RightHand))
+	if (MontageTag.MatchesTagExact(GameplayTags.CombatSocket_RightHand))
 	{
 		return GetMesh()->GetSocketLocation(RightHandSocketName);
 	}
-	if (MontageTag.MatchesTagExact(FAuraGameplayTags::Get().CombatSocket_Tail))
+	if (MontageTag.MatchesTagExact(GameplayTags.CombatSocket_Tail))
 	{
 		return GetMesh()->GetSocketLocation(TailSocketName);
 	}
@@ -151,7 +151,6 @@ void AAuraCharacterBase::InitializeDefaultAttributes() const
 
 void AAuraCharacterBase::AddCharacterAbilities()
 {
-
 	UAuraAbilitySystemComponent* AuraASC = CastChecked<UAuraAbilitySystemComponent>(AbilitySystemComponent);
 	if (!HasAuthority()) return;
 
