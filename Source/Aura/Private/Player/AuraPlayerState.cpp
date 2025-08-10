@@ -63,7 +63,7 @@ void AAuraPlayerState::AddToLevel(int32 InLevel)
 void AAuraPlayerState::AddToXP(const int32 InXP)
 {
 	XP += InXP;
-	const int32 NewLevel = LevelUpInfo->FindLevelForXp(InXP);
+	const int32 NewLevel = LevelUpInfo->FindLevelForXp(XP);
 	const int32 NumberOfLevelUps = NewLevel - Level;
 	if (NumberOfLevelUps > 0)
 	{
@@ -75,7 +75,7 @@ void AAuraPlayerState::AddToXP(const int32 InXP)
 			const int32 SpellPointsReward = LevelUpInfo->LevelUpInformation[SurpassedLevel].SpellPointReward;
 			AddToSpellPoints(SpellPointsReward);
 		}
-		AddToLevel(NewLevel);
+		AddToLevel(NumberOfLevelUps);
 		Cast<UAuraAttributeSet>(AttributeSet)->MaximizeVitalAttributes();
 	}
 	OnXPChangedDelegate.Broadcast(XP);
