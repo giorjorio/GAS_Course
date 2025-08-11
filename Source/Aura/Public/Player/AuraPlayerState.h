@@ -44,8 +44,8 @@ public:
 	
 	FORCEINLINE int32 GetPlayerLevel() const { return Level; }
 	FORCEINLINE int32 GetPlayerXP() const { return XP; }
-	FORCEINLINE int32 GetAttributePoints() const { return Level; }
-	FORCEINLINE int32 GetSpellPoints() const { return XP; }
+	FORCEINLINE int32 GetAttributePoints() const { return AttributePoints; }
+	FORCEINLINE int32 GetSpellPoints() const { return SpellPoints; }
 	
 	void SetLevel(int32 InLevel);
 	void SetXP(int32 InXP);
