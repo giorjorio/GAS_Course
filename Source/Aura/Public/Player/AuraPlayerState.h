@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/PlayerState.h"
+#include "Interaction/ModifierDependencyInterface.h"
 #include "AuraPlayerState.generated.h"
 
 
@@ -19,14 +20,21 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged, int32 /*StatValue*/);
  * 
  */
 UCLASS()
-class AURA_API AAuraPlayerState : public APlayerState, public IAbilitySystemInterface
+class AURA_API AAuraPlayerState : public APlayerState, public IAbilitySystemInterface, public IModifierDependencyInterface
 {
 	GENERATED_BODY()
 	
 public:
 	AAuraPlayerState();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
+	/* IAbilitySystemInterface */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	/* IAbilitySystemInterface end */
+
+	/* IModifierDependencyInterface */
+	FORCEINLINE virtual FOnExternalGameplayModifierDependencyChange* GetOnModifiedDependencyChanged() override { return &OnModifierDependencyChangedDelegate; }
+	/* IModifierDependencyInterface end */
 	
 	UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
@@ -94,8 +102,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_SpellPoints(int32 OldSpellPoints);
-	
 
+	// Diego's solution in 268 lecture
+	FOnExternalGameplayModifierDependencyChange OnModifierDependencyChangedDelegate;
 	
 
 	

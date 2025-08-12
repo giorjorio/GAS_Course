@@ -143,19 +143,38 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const struct FGameplayEffectMo
 		const float LocalIncomingXP = GetIncomingXP();
 		SetIncomingXP(0.f);
 		//UE_LOG(LogAura, Log, TEXT("Incoming XP: %f"), LocalIncomingXP);
-
-		//TODO: See if we should level up
-
+		
 		// Source Character is the owner, since GA_ListenForEvents applies GE_EventBasedEffect, adding to IncomingXP
 		if (LocalIncomingXP > 0.f && Props.SourceCharacter->Implements<UPlayerInterface>())
 		{
+			/*bTopOffHealth = true;
+			bTopOffMana = true;*/
 			IPlayerInterface::Execute_AddToXP(Props.SourceCharacter, LocalIncomingXP);
 		}
 	}
 }
 
+/*void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	// Stephen's way in 268, I used Diego's from comments in this lecture
+	
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+
+	/*if (Attribute == GetMaxHealthAttribute() && bTopOffHealth)
+	{
+		SetHealth(GetMaxHealth());
+		bTopOffHealth = false;
+	}
+	if (Attribute == GetMaxManaAttribute() && bTopOffMana)
+	{
+		SetMana(GetMaxMana());
+		bTopOffMana = false;
+	}#1#
+}*/
+
 void UAuraAttributeSet::MaximizeVitalAttributes()
 {
+	// Not in use right now
 	SetHealth(GetMaxHealth());
 	SetMana(GetMaxMana());
 }

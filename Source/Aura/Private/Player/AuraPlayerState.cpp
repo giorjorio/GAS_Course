@@ -58,15 +58,10 @@ void AAuraPlayerState::AddToSpellPoints(int32 InSpellPoints)
 	OnSpellPointsChangedDelegate.Broadcast(SpellPoints);
 }
 
-void AAuraPlayerState::AddToLevel(int32 InLevel)
-{
-	Level += InLevel;
-	OnLevelChangedDelegate.Broadcast(Level);
-}
-
 void AAuraPlayerState::AddToXP(const int32 InXP)
 {
 	XP += InXP;
+	
 	const int32 NewLevel = LevelUpInfo->FindLevelForXp(XP);
 	const int32 NumberOfLevelUps = NewLevel - Level;
 	if (NumberOfLevelUps > 0)
@@ -80,9 +75,19 @@ void AAuraPlayerState::AddToXP(const int32 InXP)
 			AddToSpellPoints(SpellPointsReward);
 		}
 		AddToLevel(NumberOfLevelUps);
-		Cast<UAuraAttributeSet>(AttributeSet)->MaximizeVitalAttributes();
 	}
 	OnXPChangedDelegate.Broadcast(XP);
+}
+
+void AAuraPlayerState::AddToLevel(int32 InLevel)
+{
+	Level += InLevel;
+	// Force a recalculation of MMC_MaxHealth and MMC_MaxMana's magnitudes, which depend on Level.
+	OnModifierDependencyChangedDelegate.Broadcast();
+	// Maximize vital attributes using the updated magnitudes
+	Cast<UAuraAttributeSet>(AttributeSet)->MaximizeVitalAttributes();
+	
+	OnLevelChangedDelegate.Broadcast(Level);
 }
 
 void AAuraPlayerState::OnRep_Level(int32 OldLevel)
