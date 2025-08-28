@@ -18,7 +18,7 @@ struct FGameplayAttribute;
 /**
  * 
  */
-UCLASS(BlueprintType, Blueprintable)
+UCLASS()
 class AURA_API UAttributeMenuWidgetController : public UAuraWidgetController
 {
 	GENERATED_BODY()
