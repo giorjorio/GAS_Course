@@ -56,7 +56,22 @@ public:
 	FGameplayTag Abilities;
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
+
 	FGameplayTag Abilities_Fire_Firebolt;
+	
+	FGameplayTag Abilities_HitReact;
+
+	FGameplayTag Abilities_Status;
+	FGameplayTag Abilities_Status_Eligible;
+	FGameplayTag Abilities_Status_Equipped;
+	FGameplayTag Abilities_Status_Locked;
+	FGameplayTag Abilities_Status_Unlocked;
+
+	FGameplayTag Abilities_Type_None;
+	FGameplayTag Abilities_Type_Offensive;
+	FGameplayTag Abilities_Type_Passive;
+	
+	
 
 	/* Cooldown Tags */
 	FGameplayTag Cooldown_Fire_Firebolt;
