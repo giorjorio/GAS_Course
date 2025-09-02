@@ -59,6 +59,8 @@ public:
 
 	FGameplayTag Abilities_Fire_Firebolt;
 	
+	FGameplayTag Abilities_Lightning_Electrocute;
+	
 	FGameplayTag Abilities_HitReact;
 
 	FGameplayTag Abilities_Status;
@@ -72,9 +74,10 @@ public:
 	FGameplayTag Abilities_Type_Passive;
 	
 	
-
 	/* Cooldown Tags */
 	FGameplayTag Cooldown_Fire_Firebolt;
+
+	FGameplayTag Cooldown_Lightning_Electrocute;
 	
 	/* Effect Tags */
 	FGameplayTag Effects_HitReact;

@@ -8,9 +8,12 @@
 
 
 
+
 enum class ECharacterClass : uint8;
 class UAbilitySystemComponent;
+class UAbilityInfo;
 class UAttributeMenuWidgetController;
+class UCharacterClassInfo;
 class UOverlayWidgetController;
 class USpellMenuWidgetController;
 struct FGameplayEffectContextHandle;
@@ -46,6 +49,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|CharacterClassDefaults")
 	static UCharacterClassInfo* GetCharacterClassInfo(const UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable, Category = "AuraAbilitySystemLibrary|Ability")
+	static UAbilityInfo* GetAbilityInfo(const UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|GameplayEffects")
 	static bool IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);
