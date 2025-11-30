@@ -75,6 +75,12 @@ void AAuraPlayerState::AddToXP(const int32 InXP)
 			AddToSpellPoints(SpellPointsReward);
 		}
 		AddToLevel(NumberOfLevelUps);
+		
+		if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
+		{
+			AuraASC->UpdateAbilityStatuses(NewLevel);
+		}
+		
 	}
 	OnXPChangedDelegate.Broadcast(XP);
 }
