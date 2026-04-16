@@ -54,6 +54,7 @@ public:
 
 	/* Ability Tags */
 	FGameplayTag Abilities;
+	FGameplayTag Abilities_None;
 	FGameplayTag Abilities_Attack;
 	FGameplayTag Abilities_Summon;
 
