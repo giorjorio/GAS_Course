@@ -11,6 +11,7 @@
 #include "AuraCharacterBase.generated.h"
 
 
+class UDebuffNiagaraComponent;
 class UAbilitySystemComponent;
 class UAnimMontage;
 class UAttributeSet;
@@ -43,7 +44,12 @@ public:
 	virtual void DecrementMinionCount_Implementation(int32 Amount) override;
 	FORCEINLINE virtual float GetHalfHeight() const override { return GetCapsuleComponent()->GetScaledCapsuleHalfHeight(); };
 	virtual ECharacterClass GetCharacterClass_Implementation() override;
+	virtual FOnAbilitySystemComponentRegistered& GetOnAbilitySystemComponentRegisteredDelegate() override;
+	virtual FOnDeath& GetOnDeathDelegate() override;
 	/* end Combat Interface */
+	
+	FOnAbilitySystemComponentRegistered OnAbilitySystemComponentRegistered;
+	FOnDeath OnDeath;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath();
@@ -111,6 +117,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Character Class Defaults")
 	ECharacterClass CharacterClass = ECharacterClass::Warrior;
+	
+	UPROPERTY(VisibleAnywhere)
+	TObjectPtr<UDebuffNiagaraComponent> BurnDebuffComponent;
 	
 private:
 
