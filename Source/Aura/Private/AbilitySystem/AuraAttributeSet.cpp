@@ -191,6 +191,12 @@ void UAuraAttributeSet::HandleIncomingDamage(FEffectProperties Props)
 			{
 				Debuff(Props);
 			}
+			
+			const FVector& KnockbackForce = UAuraAbilitySystemLibrary::GetKnockbackForce(Props.EffectContextHandle);
+			if (KnockbackForce.Length() > 1.f)
+			{
+				Props.TargetCharacter->LaunchCharacter(KnockbackForce, true, true);
+			}
 		}
 			
 		const bool bBlock = UAuraAbilitySystemLibrary::IsBlockedHit(Props.EffectContextHandle);
