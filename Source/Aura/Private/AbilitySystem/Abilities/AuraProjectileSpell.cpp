@@ -6,7 +6,6 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Actor/AuraProjectile.h"
-#include "Aura/Public/AuraGameplayTags.h"
 #include "Interaction/CombatInterface.h"
 
 
@@ -35,12 +34,11 @@ void UAuraProjectileSpell::SpawnProjectile(const FVector& ProjectileTargetLocati
 	SpawnTransform.SetLocation(SocketLocation);
 	SpawnTransform.SetRotation(Rotation.Quaternion());
 
-	AActor* AvatarActor = GetAvatarActorFromActorInfo();
 	AAuraProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAuraProjectile>(
 		ProjectileClass,
 		SpawnTransform,
-		AvatarActor,
-		Cast<APawn>(AvatarActor),
+		GetOwningActorFromActorInfo(),
+		Cast<APawn>(GetOwningActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 	Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();

@@ -15,6 +15,8 @@ TArray<FVector> UAuraSummonAbility::GetSpawnLocations()
 
 	// Waiting for the OnDeathDelegate to work perfect
 	int32 CurrentMinions = CombatInterface->Execute_GetMinionCount(GetAvatarActorFromActorInfo());
+	
+	// Can't use the EvenlySpaceRotators func UAuraAbilitySystemLibrary because here are some changes specific for the shaman which depends on how many minions he has
 	const float DeltaSpread = SpawnSpread / (NumMinions - CurrentMinions);
 
 
