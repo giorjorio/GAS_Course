@@ -195,6 +195,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	{
 		if (GetASC())
 		{
+			bAutoRunning = false;
 			GetASC()->AbilityInputTagHeld(InputTag);
 		}
 	}
