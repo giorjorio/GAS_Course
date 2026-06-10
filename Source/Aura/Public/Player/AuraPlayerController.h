@@ -8,6 +8,7 @@
 #include "AuraPlayerController.generated.h"
 
 
+class UNiagaraSystem;
 class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
 class UDamageTextComponent;
@@ -115,6 +116,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Click-To-Move")
 	bool bDrawDebugEnabled = false;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TObjectPtr<UNiagaraSystem> ClickNiagaraSystem;
 
 	void AutoRun();
 

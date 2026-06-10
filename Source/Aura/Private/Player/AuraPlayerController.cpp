@@ -15,6 +15,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Interaction/CombatInterface.h"
 #include "UI/Widget/DamageTextComponent.h"
 
@@ -280,8 +281,18 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 							Spline->AddSplinePoint(PointLoc, ESplineCoordinateSpace::World);
 						}
 						
-						TargetSplinePointIdx = 1;
-						bAutoRunning = true;
+						if (Spline->GetNumberOfSplinePoints() > 1)
+						{
+						 	TargetSplinePointIdx = 1;
+						 	bAutoRunning = true;
+						}
+						else
+						{
+							bAutoRunning = false;
+						}
+						const FVector FinalDestination = NavPath->PathPoints.Last();
+						
+						UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, FinalDestination);
 					}
 				}
 				if (bDrawDebugEnabled)
@@ -290,6 +301,7 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 					DrawDebugSphere(GetWorld(), ImpactPointNavLocation, 20.f, 12, FColor::Yellow, false, 3.0f);
 				}
 			}
+			
 		}
 		FollowTime = 0.f;
 		bTargeting = false;
