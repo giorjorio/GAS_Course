@@ -6,6 +6,7 @@
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "Actor/AuraProjectile.h"
+#include "GameFramework/ProjectileMovementComponent.h"
 
 FString UAuraFireBolt::GetDescription(int32 Level)
 {
@@ -119,7 +120,7 @@ void UAuraFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, co
 	if (bOverridePitch)	Rotation.Pitch = PitchOverride;
 	
 	const FVector Forward = Rotation.Vector();
-	
+	NumberOfProjectiles = FMath::Min(GetAbilityLevel(), MaxNumberOfProjectiles);
 	TArray<FRotator> Rotations = UAuraAbilitySystemLibrary::EvenlySpaceRotators(Forward, FVector::UpVector, ProjectileSpread, NumberOfProjectiles);
 	
 	for (const FRotator& Rot : Rotations)
@@ -136,9 +137,37 @@ void UAuraFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, co
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+		
+		if (HomingTarget && HomingTarget->Implements<UCombatInterface>())
+		{
+			Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
+		}
+		else
+		{
+			Projectile->HomingTargetSceneComponent = NewObject<USceneComponent>(Projectile);
+			Projectile->HomingTargetSceneComponent->SetWorldLocation(ProjectileTargetLocation);
+			// ARCHITECTURE NOTE: 
+			// Standard Unreal Engine practice requires calling RegisterComponent() after NewObject().
+			// However, registration is intentionally omitted here to optimize performance.
+			// Registration incurs system overhead (initializing physics, rendering, and adding to the scene graph),
+			// whereas UProjectileMovementComponent solely requires access to the transformation matrix (FVector) 
+			// in RAM for trajectory calculation.
+			//
+			// ARCHITECTURAL ALTERNATIVES:
+			// 1. Pre-allocation: Create the USceneComponent in the projectile's constructor via 
+			//    CreateDefaultSubobject. Move this existing component as needed, avoiding runtime NewObject calls.
+			// 2. Custom Movement Component: Inherit from UProjectileMovementComponent, add an FVector 
+			//    target variable, and override ComputeHomingAcceleration() to handle vector-based 
+			//    homing directly, completely eliminating the need for dummy components.
+			
+			Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetSceneComponent;
+		}
+		Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
+		Projectile->ProjectileMovement->bIsHomingProjectile = bLaunchHomingProjectiles;
 	
 		Projectile->FinishSpawning(SpawnTransform);
 	}
+	
 	
 
 }

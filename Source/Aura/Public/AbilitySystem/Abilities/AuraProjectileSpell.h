@@ -30,7 +30,10 @@ protected:
 	TSubclassOf<AAuraProjectile> ProjectileClass;
 	
 	UPROPERTY(EditDefaultsOnly)
-	int32 NumberOfProjectiles = 5;
+	int32 NumberOfProjectiles = 1;
+	
+	UPROPERTY(EditDefaultsOnly)
+	int32 MaxNumberOfProjectiles = 5;
 
 	
 };
