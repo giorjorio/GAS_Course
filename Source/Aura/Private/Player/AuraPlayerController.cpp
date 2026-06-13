@@ -177,7 +177,6 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 	if (InputTag.MatchesTagExact(FAuraGameplayTags::Get().InputTag_LMB))
 	{
 		bTargeting = ThisActor ? true : false;
-		bAutoRunning = false;
 		ControlledPawnHalfHeight = Cast<ICombatInterface>(GetPawn())->GetHalfHeight();
 	}
 	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
@@ -198,6 +197,7 @@ void AAuraPlayerController::AbilityInputTagHeld(FGameplayTag InputTag)
 	{
 		if (GetASC())
 		{
+			bAutoRunning = false;
 			GetASC()->AbilityInputTagHeld(InputTag);
 		}
 	}
