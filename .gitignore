@@ -18,3 +18,12 @@ Content/*
 *.suo
 *.scodeproj
 *.xcworkspace
+
+# Rider / JetBrains
+.idea/
+.idea_BACKUP/
+.idea_modules/
+*.sln.iml
+*.ipr
+*.iws
+*.DotSettings.user
