@@ -196,6 +196,10 @@ void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
 		bTargeting = ThisActor ? true : false;
 		ControlledPawnHalfHeight = Cast<ICombatInterface>(GetPawn())->GetHalfHeight();
 	}
+	else
+	{
+		bAutoRunning = false;
+	}
 	if (GetASC()) GetASC()->AbilityInputTagPressed(InputTag);
 }
 
