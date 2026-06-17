@@ -73,6 +73,7 @@ void AAuraPlayerController::CursorTrace()
 {
 	if (GetASC() && GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_CursorTrace))
 	{
+	// TODO: Encapsulate this to a separate methods
 		if (LastActor) LastActor->UnHighlightActor();
 		if (ThisActor) ThisActor->UnHighlightActor();
 		LastActor = nullptr;
