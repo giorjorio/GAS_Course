@@ -342,6 +342,70 @@ void UAuraAbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldC
 	}
 }
 
+void UAuraAbilitySystemLibrary::GetClosestTargets(int32 MaxTargets, const TArray<AActor*>& Actors, TArray<AActor*>& OutClosestTargets, const FVector& Origin)
+{
+    /*Early exit optimization: If the total number of available actors is less than or equal 
+    to the requested maximum, there is no need to sort or calculate distances.
+    We simply return the original array.*/
+    if (Actors.Num() <= MaxTargets)
+    {
+       OutClosestTargets = Actors;
+       return;
+    }
+    
+    /*Create an array of pairs to cache the calculated distances.
+    Key = Squared Distance (double), Value = Actor Pointer (AActor*).*/
+    TArray<TPair<double, AActor*>> DistancePairs;
+    
+    /* SetNumUninitialized allocates the exact memory block needed for the array instantly 
+      without calling default constructors, which saves processing time.
+     */
+    DistancePairs.SetNumUninitialized(Actors.Num());
+    
+    /*Iterate through all actors exactly once to calculate their distances.*/
+    for(int32 i = 0; i< Actors.Num(); i++)
+    {
+       /*Calculate the squared distance instead of the true length. 
+       This completely avoids the highly expensive square root operation (FMath::Sqrt) 
+       while maintaining the exact same sorting proportions.*/
+       const double DistanceSq = FVector::DistSquared(Origin, Actors[i]->GetActorLocation());
+       
+       /*Store the calculated distance and the actor reference in the pre-allocated array.*/
+       DistancePairs[i] = TPair<double, AActor*>(DistanceSq, Actors[i]);
+    }
+    
+    /*Safety clamp: Ensure we do not try to find more targets than we actually have,
+    preventing potential Index Out Of Bounds errors during the partitioning step.*/
+    const int32 NumToFind = FMath::Min(MaxTargets, DistancePairs.Num());
+    
+    /*std::nth_element performs an O(N) partial sort (partitioning).
+    It guarantees that the 'NumToFind' smallest elements are moved to the front of the array.
+    It does NOT fully sort the entire array (which would be O(N log N)), 
+    saving significant CPU resources by ignoring the exact order of the remaining elements.*/
+    std::nth_element(
+        DistancePairs.GetData(),                      // Iterator to the beginning of the array
+        DistancePairs.GetData() + NumToFind,          // The boundary iterator (target amount)
+        DistancePairs.GetData() + DistancePairs.Num(),// Iterator to the end of the array
+        [](const TPair<double, AActor*>& A, const TPair<double, AActor*>& B)
+        {
+            // Custom predicate: Compare the cached squared distances (the Keys of the pairs)
+            return A.Key < B.Key;
+        }
+    );
+    
+    /*Pre-allocate memory for the final output array to strictly avoid 
+    dynamic memory reallocation during the subsequent loop.*/
+    OutClosestTargets.Reserve(NumToFind);
+    
+    /*Extract the Actor pointers from the first 'NumToFind' elements of the partitioned array.
+    These are guaranteed to be the closest targets, though they may not be perfectly 
+    sorted among themselves.*/
+    for (int32 i = 0; i < NumToFind; ++i)
+    {
+       OutClosestTargets.Add(DistancePairs[i].Value);
+    }
+}
+
 bool UAuraAbilitySystemLibrary::IsNotFriend(AActor* FirstActor, AActor* SecondActor)
 {
 	const bool bBothArePlayers = FirstActor->ActorHasTag(FName("Player")) && SecondActor->ActorHasTag(FName("Player"));
