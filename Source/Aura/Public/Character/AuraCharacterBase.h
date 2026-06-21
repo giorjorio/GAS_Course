@@ -45,12 +45,12 @@ public:
 	FORCEINLINE virtual float GetHalfHeight() const override { return GetCapsuleComponent()->GetScaledCapsuleHalfHeight(); };
 	virtual ECharacterClass GetCharacterClass_Implementation() override;
 	virtual FOnAbilitySystemComponentRegistered& GetOnAbilitySystemComponentRegisteredDelegate() override;
-	virtual FOnDeath& GetOnDeathDelegate() override;
+	virtual FOnDeathSignature& GetOnDeathDelegate() override;
 	virtual USkeletalMeshComponent* GetWeapon_Implementation() override;
 	/* end Combat Interface */
 	
 	FOnAbilitySystemComponentRegistered OnAbilitySystemComponentRegistered;
-	FOnDeath OnDeath;
+	FOnDeathSignature OnDeathDelegate;
 	
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void MulticastHandleDeath(const FVector& DeathImpulse);
