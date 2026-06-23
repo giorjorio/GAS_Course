@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraFunctionLibrary.h"
 #include "AbilitySystem/AuraAbilitySystemLibrary.h"
+#include "Interaction/CombatInterface.h"
 
 
 AAuraProjectile::AAuraProjectile()
@@ -39,8 +40,9 @@ void AAuraProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 	SetLifeSpan(LifeSpan);
+	SetReplicateMovement(true);
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &AAuraProjectile::OnSphereOverlap);
-
+	
 	LoopingSoundComponent = UGameplayStatics::SpawnSoundAttached(
 		LoopingSound,
 		GetRootComponent(),
@@ -49,12 +51,24 @@ void AAuraProjectile::BeginPlay()
 		FRotator::ZeroRotator,
 		EAttachLocation::KeepRelativeOffset,
 		true);
+	
+	// BIND TO DEATH DELEGATE (Server only)
+	if (HasAuthority() && ProjectileMovement->HomingTargetComponent.IsValid())
+	{
+		// Get the component's owner (the enemy) and cast to the combat interface
+		ICombatInterface* CombatInterface = Cast<ICombatInterface>(ProjectileMovement->HomingTargetComponent->GetOwner());
+		if (CombatInterface)
+		{
+			// Bind our function to the death broadcast
+			// Note: Check your interface function name (GetOnDeath() vs GetOnDeathDelegate())
+			CombatInterface->GetOnDeathDelegate().AddUniqueDynamic(this, &ThisClass::OnHomingTargetDeath);
+		}
+	}
 }
 
 void AAuraProjectile::Destroyed()
 {
 	if (!bHit && !HasAuthority()) ExecuteImpactEffects();
-	
 	Super::Destroyed();
 }
 
@@ -94,11 +108,26 @@ void AAuraProjectile::OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, 
 	}
 }
 
+void AAuraProjectile::OnHomingTargetDeath(AActor* DeadActor)
+{
+	// Once the enemy broadcasts its death, disable homing.
+	// The projectile will continue flying straight based on its current velocity.
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->bIsHomingProjectile = false;
+	}
+}
+
 void AAuraProjectile::ExecuteImpactEffects()
 {
 	UE_LOG(LogTemp, Display, TEXT("[%s] spawned"), *GetName());
 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound, GetActorLocation(), FRotator::ZeroRotator);
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, GetActorLocation());
+	if (LoopingSoundComponent)
+	{
+		LoopingSoundComponent->Stop();
+		LoopingSoundComponent->DestroyComponent();
+	}
 	bHit = true;
 }
 

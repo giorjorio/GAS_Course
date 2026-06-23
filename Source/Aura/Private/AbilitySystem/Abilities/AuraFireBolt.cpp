@@ -137,34 +137,52 @@ void UAuraFireBolt::SpawnProjectiles(const FVector& ProjectileTargetLocation, co
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
 		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
-		
-		if (HomingTarget && HomingTarget->Implements<UCombatInterface>())
+		if (bLaunchHomingProjectiles)
 		{
-			Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
-		}
-		else
-		{
-			Projectile->HomingTargetSceneComponent = NewObject<USceneComponent>(Projectile);
-			Projectile->HomingTargetSceneComponent->SetWorldLocation(ProjectileTargetLocation);
-			// ARCHITECTURE NOTE: 
-			// Standard Unreal Engine practice requires calling RegisterComponent() after NewObject().
-			// However, registration is intentionally omitted here to optimize performance.
-			// Registration incurs system overhead (initializing physics, rendering, and adding to the scene graph),
-			// whereas UProjectileMovementComponent solely requires access to the transformation matrix (FVector) 
-			// in RAM for trajectory calculation.
-			//
-			// ARCHITECTURAL ALTERNATIVES:
-			// 1. Pre-allocation: Create the USceneComponent in the projectile's constructor via 
-			//    CreateDefaultSubobject. Move this existing component as needed, avoiding runtime NewObject calls.
-			// 2. Custom Movement Component: Inherit from UProjectileMovementComponent, add an FVector 
-			//    target variable, and override ComputeHomingAcceleration() to handle vector-based 
-			//    homing directly, completely eliminating the need for dummy components.
+			// SCENARIO 1: We have a valid target (clicked on an enemy)
+			if (HomingTarget && HomingTarget->Implements<UCombatInterface>())
+			{
+				// Check if the target is still alive
+				if (!ICombatInterface::Execute_IsDead(HomingTarget))
+				{
+					// The enemy is ALIVE - enable homing towards it
+					Projectile->ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
+					Projectile->ProjectileMovement->bIsHomingProjectile = true;
+					Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
+				}
+				else
+				{
+					// The enemy is DEAD. 
+					// We DO NOT create a floating magnet to avoid the "orbiting" bug.
+					// We simply disable homing and let the projectile fly straight.
+					Projectile->ProjectileMovement->bIsHomingProjectile = false;
+				}
+			}
+			// SCENARIO 2: There was no initial target (clicked on the ground)
+			else
+			{
+				Projectile->HomingTargetSceneComponent = NewObject<USceneComponent>(Projectile);
+				Projectile->HomingTargetSceneComponent->SetWorldLocation(ProjectileTargetLocation);
+				
+				/* ARCHITECTURE NOTE: 
+				Standard Unreal Engine practice requires calling RegisterComponent() after NewObject().
+				However, registration is intentionally omitted here to optimize performance.
+				Registration incurs system overhead (initializing physics, rendering, and adding to the scene graph),
+				whereas UProjectileMovementComponent solely requires access to the transformation matrix (FVector) 
+				in RAM for trajectory calculation.
+				
+				ARCHITECTURAL ALTERNATIVES:
+				1. Pre-allocation: Create the USceneComponent in the projectile's constructor via 
+				   CreateDefaultSubobject. Move this existing component as needed, avoiding runtime NewObject calls.
+				2. Custom Movement Component: Inherit from UProjectileMovementComponent, add an FVector 
+				   target variable, and override ComputeHomingAcceleration() to handle vector-based 
+				   homing directly, completely eliminating the need for dummy components. */
 			
-			Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetSceneComponent;
+				Projectile->ProjectileMovement->HomingTargetComponent = Projectile->HomingTargetSceneComponent;
+				Projectile->ProjectileMovement->bIsHomingProjectile = true;
+				Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
+			}
 		}
-		Projectile->ProjectileMovement->HomingAccelerationMagnitude = FMath::FRandRange(HomingAccelerationMin, HomingAccelerationMax);
-		Projectile->ProjectileMovement->bIsHomingProjectile = bLaunchHomingProjectiles;
-	
 		Projectile->FinishSpawning(SpawnTransform);
 	}
 	
