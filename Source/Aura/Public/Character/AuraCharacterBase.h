@@ -50,6 +50,8 @@ public:
 	/* end Combat Interface */
 	
 	FOnAbilitySystemComponentRegistered OnAbilitySystemComponentRegistered;
+	
+	UPROPERTY(BlueprintAssignable)
 	FOnDeathSignature OnDeathDelegate;
 	
 	UFUNCTION(NetMulticast, Reliable)
@@ -57,6 +59,11 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TArray<FTaggedMontage> AttackMontages;
+	
+	virtual void ShowDamageText_Implementation(float Damage, bool bBlockedHit, bool bCriticalHit) override;
+	
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_ShowDamageText(float Damage, bool bBlockedHit, bool bCriticalHit);
 
 protected:
 	virtual void BeginPlay() override;

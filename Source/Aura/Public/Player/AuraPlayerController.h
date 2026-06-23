@@ -34,6 +34,9 @@ public:
 
 	UFUNCTION(Client, Reliable)
 	void ShowDamageNumber(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit);
+	
+	UFUNCTION(BlueprintCallable, Category = "Aura|UI")
+	void SetCursorVisibilityAndRefresh(bool bShowCursor);
 
 protected:
 	virtual void BeginPlay() override;

@@ -104,5 +104,8 @@ public:
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	USkeletalMeshComponent* GetWeapon();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void ShowDamageText(float Damage, bool bBlockedHit, bool bCriticalHit);
 
 };

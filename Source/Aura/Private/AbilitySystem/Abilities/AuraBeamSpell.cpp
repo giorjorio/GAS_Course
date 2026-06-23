@@ -91,7 +91,9 @@ void UAuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTarget
 	
 	UAuraAbilitySystemLibrary::GetClosestTargets(NumAdditionalTargets, OverlappingActors, OutAdditionalTargets, MouseHitActor->GetActorLocation());
 
-	for (AActor* Target : OutAdditionalTargets)
+	AdditionalTargets = OutAdditionalTargets;
+	
+	for (AActor* Target : AdditionalTargets)
 	{
 		if (ICombatInterface* CombatInterface = Cast<ICombatInterface>(Target))
 		{
@@ -101,4 +103,43 @@ void UAuraBeamSpell::StoreAdditionalTargets(TArray<AActor*>& OutAdditionalTarget
 			}
 		}
 	}
+}
+
+void UAuraBeamSpell::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
+{
+	// 1. Отвязываем ОСНОВНУЮ цель (MouseHitActor)
+	if (MouseHitActor && MouseHitActor->Implements<UCombatInterface>())
+	{
+		ICombatInterface* CombatInterface = Cast<ICombatInterface>(MouseHitActor);
+		if (CombatInterface)
+		{
+			// Используем RemoveDynamic вместо AddDynamic. 
+			// Замени PrimaryTargetDied на то название функции, которым ты привязывал основную цель
+			CombatInterface->GetOnDeathDelegate().RemoveDynamic(this, &UAuraBeamSpell::PrimaryTargetDied);
+		}
+	}
+
+	// 2. Отвязываем ВТОРОСТЕПЕННЫЕ цели
+	// Важно: OutAdditionalTargets в твоем коде - это локальная переменная функции. 
+	// Тебе нужно, чтобы этот массив был сохранен в классе (например, TArray<AActor*> AdditionalTargets; в .h файле)
+	for (AActor* Target : AdditionalTargets) 
+	{
+		if (Target && Target->Implements<UCombatInterface>())
+		{
+			ICombatInterface* CombatInterface = Cast<ICombatInterface>(Target);
+			if (CombatInterface)
+			{
+				CombatInterface->GetOnDeathDelegate().RemoveDynamic(this, &UAuraBeamSpell::AdditionalTargetDied);
+			}
+		}
+	}
+
+	// Очищаем массив, чтобы при следующем касте он был пустым
+	AdditionalTargets.Empty();
+	MouseHitActor = nullptr;
+
+	// Обязательно вызываем базовый EndAbility
+	
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

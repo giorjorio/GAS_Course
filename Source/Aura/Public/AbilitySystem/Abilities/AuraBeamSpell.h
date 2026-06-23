@@ -35,7 +35,12 @@ public:
 	void AdditionalTargetDied(AActor* DeadActor);
 	
 protected:
+	
+	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Beam")
+	TArray<AActor*> AdditionalTargets;
+	
 	UPROPERTY(BlueprintReadWrite, Category = "Beam")
 	FVector MouseHitLocation;
 	

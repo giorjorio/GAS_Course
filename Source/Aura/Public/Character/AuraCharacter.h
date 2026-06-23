@@ -40,6 +40,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent;
 	
+	virtual void MulticastHandleDeath_Implementation(const FVector& DeathImpulse) override;
+	
 protected:
 	
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Attributes")

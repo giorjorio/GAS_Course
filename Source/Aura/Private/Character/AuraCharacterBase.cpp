@@ -10,6 +10,7 @@
 #include "Aura/Aura.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/AuraPlayerController.h"
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -29,6 +30,23 @@ AAuraCharacterBase::AAuraCharacterBase()
 	BurnDebuffComponent->SetupAttachment(GetRootComponent());
 	BurnDebuffComponent->DebuffTag = FAuraGameplayTags::Get().Debuff_Burn;
 	
+}
+
+void AAuraCharacterBase::Multicast_ShowDamageText_Implementation(float Damage, bool bBlockedHit, bool bCriticalHit)
+{
+	// UGameplayStatics::GetPlayerController(this, 0) на клиенте ВСЕГДА возвращает именно его локальный контроллер
+	if (AAuraPlayerController* AuraPC = Cast<AAuraPlayerController>(UGameplayStatics::GetPlayerController(this, 0)))
+	{
+		// Вызываем функцию отрисовки из контроллера. 
+		// this — это указатель на актора, который прямо сейчас получил урон (Жертва).
+		AuraPC->ShowDamageNumber(Damage, this, bBlockedHit, bCriticalHit); 
+        
+	}
+}
+
+void AAuraCharacterBase::ShowDamageText_Implementation(float Damage, bool bBlockedHit, bool bCriticalHit)
+{
+	Multicast_ShowDamageText(Damage, bBlockedHit, bCriticalHit);
 }
 
 void AAuraCharacterBase::BeginPlay()
@@ -68,7 +86,8 @@ void AAuraCharacterBase::MulticastHandleDeath_Implementation(const FVector& Deat
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
 	GetMesh()->AddImpulse(DeathImpulse, NAME_None, true);
 	
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);	
 	Dissolve();
 	bDead =	true;
 	OnDeathDelegate.Broadcast(this);

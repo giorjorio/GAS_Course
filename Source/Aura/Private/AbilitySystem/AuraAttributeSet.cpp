@@ -87,6 +87,21 @@ void UAuraAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	
 }
 
+void UAuraAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
+{
+	Super::PreAttributeChange(Attribute, NewValue);
+	
+	// Защита Current Value (от Duration/Infinite эффектов: баффы, ауры)
+	if (Attribute == GetHealthAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
+	}
+	else if (Attribute == GetManaAttribute())
+	{
+		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
+	}
+}
+
 void UAuraAttributeSet::PreAttributeBaseChange(const FGameplayAttribute& Attribute, float& NewValue) const
 {
 	Super::PreAttributeBaseChange(Attribute, NewValue);
@@ -114,8 +129,7 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	{
 		return;
 	}
-		
-
+	
 	// Incoming damage changes
 	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
 	{
@@ -125,6 +139,28 @@ void UAuraAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallba
 	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
 	{
 		HandleIncomingXP(Props);
+	}
+}
+
+void UAuraAttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue)
+{
+	Super::PostAttributeChange(Attribute, OldValue, NewValue);
+	
+	// Защита от потери модификаторов Максимума.
+	// Если бафф на MaxHealth истек, и лимит упал, необходимо жестко урезать текущее Health до нового лимита.
+	if (Attribute == GetMaxHealthAttribute())
+	{
+		if (GetHealth() > NewValue)
+		{
+			SetHealth(NewValue);
+		}
+	}
+	else if (Attribute == GetMaxManaAttribute())
+	{
+		if (GetMana() > NewValue)
+		{
+			SetMana(NewValue);
+		}
 	}
 }
 
@@ -295,17 +331,11 @@ void UAuraAttributeSet::MaximizeVitalAttributes()
 
 void UAuraAttributeSet::ShowFloatingText(const FEffectProperties& Props, float Damage, bool bBlockedHit, bool bCriticalHit) const
 {
-	if (Props.SourceCharacter != Props.TargetCharacter)
+	// Проверяем только Target, потому что урон наносится ЕМУ, значит он точно существует
+	if (Props.TargetCharacter && Props.TargetCharacter->Implements<UCombatInterface>())
 	{
-		if(AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.SourceCharacter->Controller))
-		{
-			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
-			return;
-		}
-		if(AAuraPlayerController* PC = Cast<AAuraPlayerController>(Props.TargetCharacter->Controller))
-		{
-			PC->ShowDamageNumber(Damage, Props.TargetCharacter, bBlockedHit, bCriticalHit);
-		}
+		// Вызываем функцию интерфейса (это происходит на Сервере)
+		ICombatInterface::Execute_ShowDamageText(Props.TargetCharacter, Damage, bBlockedHit, bCriticalHit);
 	}
 }
 

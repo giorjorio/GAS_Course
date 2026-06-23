@@ -27,6 +27,22 @@ AAuraPlayerController::AAuraPlayerController()
 	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
 }
 
+void AAuraPlayerController::SetCursorVisibilityAndRefresh(bool bShowCursor)
+{
+	bShowMouseCursor = bShowCursor;
+	
+	// Проверяем, инициализирована ли система Slate (защита от краша при закрытии игры)
+	if (FSlateApplication::IsInitialized())
+	{
+		// Получаем текущую позицию мыши на экране
+		FVector2D CursorPos = FSlateApplication::Get().GetCursorPos();
+		// Принудительно задаем эту же позицию обратно.
+        // Это заставляет Slate "пнуть" операционную систему и обновить видимость курсора мгновенно.
+		FSlateApplication::Get().SetCursorPos(CursorPos);
+		
+	}
+}
+
 void AAuraPlayerController::BeginPlay()
 {
 	Super::BeginPlay();

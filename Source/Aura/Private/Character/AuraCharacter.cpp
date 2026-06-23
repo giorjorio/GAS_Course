@@ -110,6 +110,17 @@ int32 AAuraCharacter::GetSpellPoints_Implementation() const
 	return AuraPlayerState->GetSpellPoints();
 }
 
+void AAuraCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
+{
+	
+	if (APlayerController* PlayerController = GetController<APlayerController>())
+	{
+		PlayerController->DisableInput(PlayerController);
+	}
+	
+	Super::MulticastHandleDeath_Implementation(DeathImpulse);
+}
+
 void AAuraCharacter::Multicast_LevelUpVFX_Implementation() const
 {
 	if (IsValid(LevelUpNiagaraComponent))
