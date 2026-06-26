@@ -11,6 +11,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/AuraPlayerController.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
+
 
 AAuraCharacterBase::AAuraCharacterBase()
 {
@@ -32,6 +35,24 @@ AAuraCharacterBase::AAuraCharacterBase()
 	
 }
 
+void AAuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	
+	DOREPLIFETIME(AAuraCharacterBase, bIsStunned);
+}
+
+void AAuraCharacterBase::OnRep_Stunned()
+{
+	
+}
+
+void AAuraCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
 void AAuraCharacterBase::Multicast_ShowDamageText_Implementation(float Damage, bool bBlockedHit, bool bCriticalHit)
 {
 	// UGameplayStatics::GetPlayerController(this, 0) на клиенте ВСЕГДА возвращает именно его локальный контроллер
@@ -47,12 +68,6 @@ void AAuraCharacterBase::Multicast_ShowDamageText_Implementation(float Damage, b
 void AAuraCharacterBase::ShowDamageText_Implementation(float Damage, bool bBlockedHit, bool bCriticalHit)
 {
 	Multicast_ShowDamageText(Damage, bBlockedHit, bCriticalHit);
-}
-
-void AAuraCharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }
 
 UAbilitySystemComponent* AAuraCharacterBase::GetAbilitySystemComponent() const
@@ -184,8 +199,15 @@ USkeletalMeshComponent* AAuraCharacterBase::GetWeapon_Implementation()
 	return Weapon;
 }
 
+void AAuraCharacterBase::StunTagChanged(const FGameplayTag CallbackTag, int32 NewCount)
+{
+	bIsStunned = NewCount > 0;
+	GetCharacterMovement()->MaxWalkSpeed = bIsStunned ? 0.f : BaseWalkSpeed;
+}
+
 void AAuraCharacterBase::InitAbilityActorInfo()
 {
+	
 }
 
 void AAuraCharacterBase::InitializeDefaultAttributes() const

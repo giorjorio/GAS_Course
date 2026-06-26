@@ -4,6 +4,7 @@
 #include "Character/AuraCharacter.h"
 
 #include "AbilitySystemComponent.h"
+#include "AuraGameplayTags.h"
 #include "AbilitySystem/AuraAbilitySystemComponent.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Camera/CameraComponent.h"
@@ -110,6 +111,28 @@ int32 AAuraCharacter::GetSpellPoints_Implementation() const
 	return AuraPlayerState->GetSpellPoints();
 }
 
+void AAuraCharacter::OnRep_Stunned()
+{
+	UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
+	{
+		const FAuraGameplayTags GameplayTags = FAuraGameplayTags::Get();
+		FGameplayTagContainer BlockedTags;
+		BlockedTags.AddTag(GameplayTags.Player_Block_CursorTrace);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputHeld);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputReleased);
+		BlockedTags.AddTag(GameplayTags.Player_Block_InputPressed);
+		BlockedTags.AddTag(GameplayTags.Player_Block_ClickToMove);
+		if (bIsStunned)
+		{
+			AuraASC->AddLooseGameplayTags(BlockedTags);
+		}
+		else
+		{
+			AuraASC->RemoveLooseGameplayTags(BlockedTags);
+		}
+	}
+}
+
 void AAuraCharacter::MulticastHandleDeath_Implementation(const FVector& DeathImpulse)
 {
 	
@@ -160,6 +183,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	AbilitySystemComponent = AuraPlayerState->GetAbilitySystemComponent();
 	AttributeSet = AuraPlayerState->GetAttributeSet();
 	OnAbilitySystemComponentRegistered.Broadcast(AbilitySystemComponent);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FAuraGameplayTags::Get().Debuff_Stun, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &AAuraCharacter::StunTagChanged);
 
 	/* It can be done in AuraPlayerController. Check Lecture #33 comments*/
 	if (AAuraPlayerController* AuraPlayerController = Cast<AAuraPlayerController>(GetController()))
