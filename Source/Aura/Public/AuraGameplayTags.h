@@ -77,6 +77,11 @@ public:
 	
 	FGameplayTag Abilities_Lightning_Electrocute;
 	
+	FGameplayTag Abilities_Passive;
+	FGameplayTag Abilities_Passive_HaloOfProtection;
+	FGameplayTag Abilities_Passive_LifeSiphon;
+	FGameplayTag Abilities_Passive_ManaSiphon;
+	
 	FGameplayTag Abilities_HitReact;
 
 	FGameplayTag Abilities_Status;
