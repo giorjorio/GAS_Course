@@ -11,6 +11,7 @@
 #include "AuraCharacterBase.generated.h"
 
 
+class UPassiveNiagaraComponent;
 class UDebuffNiagaraComponent;
 class UAbilitySystemComponent;
 class UAnimMontage;
@@ -167,6 +168,18 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Visual Effects")
+	TObjectPtr<UPassiveNiagaraComponent> HaloOfProtectionNiagaraComponent;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Visual Effects")
+	TObjectPtr<UPassiveNiagaraComponent> LifeSiphonNiagaraComponent;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Visual Effects")
+	TObjectPtr<UPassiveNiagaraComponent> ManaSiphonNiagaraComponent;
+	
+	UPROPERTY(VisibleAnywhere, Category = "Visual Effects")
+	TObjectPtr<USceneComponent> EffectAttachComponent;
 
 	
 	
