@@ -8,6 +8,7 @@
 #include "AuraPlayerController.generated.h"
 
 
+class AMagicCircle;
 class UNiagaraSystem;
 class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
@@ -37,6 +38,12 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category = "Aura|UI")
 	void SetCursorVisibilityAndRefresh(bool bShowCursor);
+	
+	UFUNCTION(BlueprintCallable)
+	void ShowMagicCircle();
+	
+	UFUNCTION(BlueprintCallable)
+	void HideMagicCircle();
 
 protected:
 	virtual void BeginPlay() override;
@@ -131,5 +138,15 @@ private:
 
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UDamageTextComponent> DamageTextComponentClass;
+	
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AMagicCircle> MagicCircleClass;
+	
+	UPROPERTY()
+	TObjectPtr<AMagicCircle> MagicCircle;
+
+	
+	 void UpdateMagicCircleLocation();
+
 };
 

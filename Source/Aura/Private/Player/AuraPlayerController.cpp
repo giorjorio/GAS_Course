@@ -16,6 +16,7 @@
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Actor/MagicCircle.h"
 #include "Interaction/CombatInterface.h"
 #include "UI/Widget/DamageTextComponent.h"
 
@@ -25,22 +26,6 @@ AAuraPlayerController::AAuraPlayerController()
 	bReplicates = true;
 
 	Spline = CreateDefaultSubobject<USplineComponent>("Spline");
-}
-
-void AAuraPlayerController::SetCursorVisibilityAndRefresh(bool bShowCursor)
-{
-	bShowMouseCursor = bShowCursor;
-	
-	// Проверяем, инициализирована ли система Slate (защита от краша при закрытии игры)
-	if (FSlateApplication::IsInitialized())
-	{
-		// Получаем текущую позицию мыши на экране
-		FVector2D CursorPos = FSlateApplication::Get().GetCursorPos();
-		// Принудительно задаем эту же позицию обратно.
-        // Это заставляет Slate "пнуть" операционную систему и обновить видимость курсора мгновенно.
-		FSlateApplication::Get().SetCursorPos(CursorPos);
-		
-	}
 }
 
 void AAuraPlayerController::BeginPlay()
@@ -71,6 +56,40 @@ void AAuraPlayerController::PlayerTick(float DeltaTime)
 	Super::PlayerTick(DeltaTime);
 	CursorTrace();
 	AutoRun();
+	UpdateMagicCircleLocation();
+}
+
+void AAuraPlayerController::SetCursorVisibilityAndRefresh(bool bShowCursor)
+{
+	bShowMouseCursor = bShowCursor;
+	
+	// Check if the Slate application is initialized (prevents a crash when closing the game)
+	if (FSlateApplication::IsInitialized())
+	{
+		// Get the current mouse cursor position on the screen
+		FVector2D CursorPos = FSlateApplication::Get().GetCursorPos();
+    
+		// Forcefully set the cursor position back to the exact same location.
+		// This forces Slate to update the OS and instantly refresh the cursor's visibility.
+		FSlateApplication::Get().SetCursorPos(CursorPos);
+	}
+}
+
+void AAuraPlayerController::ShowMagicCircle()
+{
+	if (!IsValid(MagicCircle))
+	{
+		FVector MagicCircleLocation = CursorHit.ImpactPoint;
+		MagicCircle = GetWorld()->SpawnActor<AMagicCircle>(MagicCircleClass, MagicCircleLocation, FRotator::ZeroRotator);
+	}
+}
+
+void AAuraPlayerController::HideMagicCircle()
+{
+	if (IsValid(MagicCircle))
+	{
+		MagicCircle->Destroy();
+	}
 }
 
 void AAuraPlayerController::ShowDamageNumber_Implementation(float DamageAmount, ACharacter* TargetCharacter, bool bBlockedHit, bool bCriticalHit)
@@ -199,6 +218,14 @@ void AAuraPlayerController::AutoRun()
 	}
 
 	
+}
+
+void AAuraPlayerController::UpdateMagicCircleLocation()
+{
+	if (IsValid(MagicCircle))
+	{
+		MagicCircle->SetActorLocation(CursorHit.ImpactPoint);
+	}
 }
 
 void AAuraPlayerController::AbilityInputTagPressed(FGameplayTag InputTag)
