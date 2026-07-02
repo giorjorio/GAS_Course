@@ -35,6 +35,8 @@ public:
 	virtual int32 GetXP_Implementation() const override;
 	virtual int32 GetAttributePoints_Implementation() const override;
 	virtual int32 GetSpellPoints_Implementation() const override;
+	virtual void ShowMagicCircle_Implementation(UMaterialInstance* DecalMaterial) override;
+	virtual void HideMagicCircle_Implementation() override;
 	/* end Player Interface */
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Level")

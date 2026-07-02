@@ -17,6 +17,7 @@
 #include "NavigationSystem.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Actor/MagicCircle.h"
+#include "Components/DecalComponent.h"
 #include "Interaction/CombatInterface.h"
 #include "UI/Widget/DamageTextComponent.h"
 
@@ -75,12 +76,17 @@ void AAuraPlayerController::SetCursorVisibilityAndRefresh(bool bShowCursor)
 	}
 }
 
-void AAuraPlayerController::ShowMagicCircle()
+void AAuraPlayerController::ShowMagicCircle(UMaterialInstance* DecalMaterial)
 {
 	if (!IsValid(MagicCircle))
 	{
 		FVector MagicCircleLocation = CursorHit.ImpactPoint;
+		
 		MagicCircle = GetWorld()->SpawnActor<AMagicCircle>(MagicCircleClass, MagicCircleLocation, FRotator::ZeroRotator);
+		if (MagicCircle && MagicCircle->MagicCircleDecal && DecalMaterial)
+		{
+			MagicCircle->MagicCircleDecal->SetMaterial(0, DecalMaterial);
+		}
 	}
 }
 
