@@ -158,7 +158,7 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 
 	// Get the effect specification, which contains data like tags and modifiers
 	const FGameplayEffectSpec& Spec = ExecutionParams.GetOwningSpec();
-
+	
 	// Creating EffectContextHandle
 	FGameplayEffectContextHandle EffectContextHandle = Spec.GetContext();
 
@@ -193,6 +193,19 @@ void UExecCalc_Damage::Execute_Implementation(const FGameplayEffectCustomExecuti
 		Resistance = FMath::Clamp(Resistance, 0.f, 100.f);
 
 		DamageTypeValue *= (100.f - Resistance) / 100.f;
+		
+		if (UAuraAbilitySystemLibrary::IsRadialDamage(EffectContextHandle))
+		{
+			DamageTypeValue = UAuraAbilitySystemLibrary::GetRadialDamageWithFalloff(
+				TargetAvatar,
+				DamageTypeValue,
+				0.f, // Minimum damage at the very edge of the radius
+				UAuraAbilitySystemLibrary::GetRadialDamageOrigin(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageInnerRadius(EffectContextHandle),
+				UAuraAbilitySystemLibrary::GetRadialDamageOuterRadius(EffectContextHandle),
+				1.f // Falloff (1.f means a linear damage drop-off)
+				);
+		}
 		
 		Damage += DamageTypeValue;
 	}

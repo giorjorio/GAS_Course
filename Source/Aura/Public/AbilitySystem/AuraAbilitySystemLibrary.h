@@ -169,4 +169,10 @@ public:
 	static TArray<FVector> EvenlyRotatedVectors(const FVector& Forward, const FVector& Axis, float Spread, int32 NumVectors);
 
 	static int32 GetXPRewardForClassAndLevel(const UObject* WorldContextObject, ECharacterClass CharacterClass, int32 CharacterLevel);
+	
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|Damage")
+	static float GetRadialDamageWithFalloff(const AActor* TargetActor, float BaseDamage, float MinimumDamage, const FVector& Origin, float DamageInnerRadius, float DamageOuterRadius, float DamageFalloff);
+	
+	UFUNCTION(BlueprintPure, Category = "AuraAbilitySystemLibrary|Damage")
+	static bool IsCharacterBehindCover(const AActor* TargetActor, const FVector& Origin);
 };

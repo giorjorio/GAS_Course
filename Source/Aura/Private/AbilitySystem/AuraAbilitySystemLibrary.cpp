@@ -9,6 +9,7 @@
 #include "AuraGameplayTags.h"
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
+#include "Engine/DamageEvents.h"
 #include "Game/AuraGameModeBase.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -138,6 +139,59 @@ int32 UAuraAbilitySystemLibrary::GetXPRewardForClassAndLevel(const UObject* Worl
 	const float XPReward = ClassDefaultInfo.XPReward.GetValueAtLevel(CharacterLevel);
 
 	return static_cast<int32>(XPReward);
+}
+
+float UAuraAbilitySystemLibrary::GetRadialDamageWithFalloff(const AActor* TargetActor, float BaseDamage,
+	float MinimumDamage, const FVector& Origin, float DamageInnerRadius, float DamageOuterRadius, float DamageFalloff)
+{
+	if (!TargetActor) return 0.f;
+
+// 1. Check for cover first! If the target is behind an obstacle, they take 0 damage.
+	
+	if (IsCharacterBehindCover(TargetActor, Origin))
+	{
+		return 0.f;
+	}
+	
+	// 2. We use the engine's native struct for clean math (no traces or physics overlap)
+	FRadialDamageParams RadialDamageParams;
+	RadialDamageParams.BaseDamage = BaseDamage;
+	RadialDamageParams.DamageFalloff = DamageFalloff;
+	RadialDamageParams.InnerRadius = DamageInnerRadius;
+	RadialDamageParams.OuterRadius = DamageOuterRadius;
+	RadialDamageParams.MinimumDamage = MinimumDamage;
+
+	// Calculate a damage multiplier from 0.0 to 1.0 based on the target's distance from the origin
+	float DamageScale = RadialDamageParams.GetDamageScale((Origin - TargetActor->GetActorLocation()).Length());
+	
+	return BaseDamage * DamageScale;
+}
+
+bool UAuraAbilitySystemLibrary::IsCharacterBehindCover(const AActor* TargetActor, const FVector& Origin)
+{
+	if (!TargetActor) return false;
+
+	/*In strict AAA, this LineTrace should happen inside the Gameplay Ability (GA) to filter targets before applying the Gameplay Effect. 
+	ExecCalc should remain pure math without world interaction; we do it here as a practical compromise.*/
+	
+	FHitResult Hit;
+	FCollisionQueryParams QueryParams;
+	
+	// Ignore the target actor itself so the trace doesn't hit its own collision capsule
+	QueryParams.AddIgnoredActor(TargetActor); 
+
+	// Use TargetActor->GetWorld() to avoid the non-static context error.
+	// Offset the target location by 50.f on the Z-axis to aim at the torso/head and ignore small ground obstacles.
+	bool bHit = TargetActor->GetWorld()->LineTraceSingleByChannel(
+		Hit, 
+		Origin, 
+		TargetActor->GetActorLocation() + FVector(0.f, 0.f, 50.f), 
+		ECC_WorldStatic, 
+		QueryParams
+	);
+
+	// If the trace hit something (bHit == true), it means there is an obstacle between the Origin and the Target
+	return bHit;
 }
 
 UCharacterClassInfo* UAuraAbilitySystemLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
@@ -276,6 +330,8 @@ FVector UAuraAbilitySystemLibrary::GetRadialDamageOrigin(const FGameplayEffectCo
 	}
 	return FVector::ZeroVector;
 }
+
+
 
 void UAuraAbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, bool bInIsBlocked)
 {
