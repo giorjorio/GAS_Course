@@ -184,12 +184,18 @@ bool UAuraAbilitySystemLibrary::IsCharacterBehindCover(const AActor* TargetActor
 	// Offset the target location by 50.f on the Z-axis to aim at the torso/head and ignore small ground obstacles.
 	bool bHit = TargetActor->GetWorld()->LineTraceSingleByChannel(
 		Hit, 
-		Origin, 
+		Origin + FVector(0.f, 0.f, 50.f), 
 		TargetActor->GetActorLocation() + FVector(0.f, 0.f, 50.f), 
 		ECC_WorldStatic, 
 		QueryParams
 	);
 
+	if (bHit)
+	{
+		// Safe check: if we hit an Actor, get its name, otherwise say "BSP/Unknown Geometry"
+		FString HitName = Hit.GetActor() ? Hit.GetActor()->GetName() : FString("BSP/Unknown Geometry");
+		UE_LOG(LogTemp, Warning, TEXT("Radial Damage LineTrace hit cover: %s"), *HitName);
+	}
 	// If the trace hit something (bHit == true), it means there is an obstacle between the Origin and the Target
 	return bHit;
 }
