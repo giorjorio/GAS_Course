@@ -30,6 +30,11 @@ AAuraCharacterBase::AAuraCharacterBase()
 	Weapon->SetupAttachment(GetMesh(),FName("WeaponHandSocket"));
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	
+	// Disable decals reception on components with collision.
+	GetCapsuleComponent()->SetReceivesDecals(false);
+	GetMesh()->SetReceivesDecals(false);
+	Weapon->SetReceivesDecals(false);
+	
 	BurnDebuffComponent = CreateDefaultSubobject<UDebuffNiagaraComponent>("BurnDebuffComponent");
 	BurnDebuffComponent->SetupAttachment(GetRootComponent());
 	BurnDebuffComponent->DebuffTag = FAuraGameplayTags::Get().Debuff_Burn;

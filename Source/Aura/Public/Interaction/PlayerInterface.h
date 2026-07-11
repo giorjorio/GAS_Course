@@ -41,7 +41,7 @@ public:
 	int32 GetSpellPoints() const;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
-	void ShowMagicCircle(UMaterialInstance* DecalMaterial = nullptr);
+	void ShowMagicCircle(UMaterialInstance* DecalMaterial = nullptr, float Radius = 0.f);
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void HideMagicCircle();

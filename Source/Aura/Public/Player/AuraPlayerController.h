@@ -40,7 +40,7 @@ public:
 	void SetCursorVisibilityAndRefresh(bool bShowCursor);
 	
 	UFUNCTION(BlueprintCallable)
-	void ShowMagicCircle(UMaterialInstance* DecalMaterial = nullptr);
+	void ShowMagicCircle(UMaterialInterface* DecalMaterial = nullptr, float Radius = 0.f);
 	
 	UFUNCTION(BlueprintCallable)
 	void HideMagicCircle();

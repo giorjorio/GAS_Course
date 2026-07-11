@@ -76,16 +76,38 @@ void AAuraPlayerController::SetCursorVisibilityAndRefresh(bool bShowCursor)
 	}
 }
 
-void AAuraPlayerController::ShowMagicCircle(UMaterialInstance* DecalMaterial)
+void AAuraPlayerController::ShowMagicCircle(UMaterialInterface* DecalMaterial, float Radius)
 {
 	if (!IsValid(MagicCircle))
 	{
 		FVector MagicCircleLocation = CursorHit.ImpactPoint;
-		
-		MagicCircle = GetWorld()->SpawnActor<AMagicCircle>(MagicCircleClass, MagicCircleLocation, FRotator::ZeroRotator);
-		if (MagicCircle && MagicCircle->MagicCircleDecal && DecalMaterial)
+		FTransform MagicCircleTransform = FTransform(FRotator::ZeroRotator, MagicCircleLocation);
+       
+		// 1. Begin deferred spawning. The actor is allocated in memory but not yet initialized in the world.
+		// This allows us to set variables before OnConstruction and BeginPlay are called.
+		MagicCircle = GetWorld()->SpawnActorDeferred<AMagicCircle>(
+			MagicCircleClass, 
+			MagicCircleTransform, 
+			this, 
+			GetPawn(), 
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+		);
+
+		if (MagicCircle)
 		{
-			MagicCircle->MagicCircleDecal->SetMaterial(0, DecalMaterial);
+			// 2. Set the initial radius before the actor finishes spawning
+			MagicCircle->InitialRadius = Radius;
+
+			// 3. Set the decal material if it's valid
+			if (DecalMaterial && MagicCircle->MagicCircleDecal)
+			{
+				// Note: SetDecalMaterial is the standard specific function for UDecalComponent
+				MagicCircle->MagicCircleDecal->SetDecalMaterial(DecalMaterial);
+			}
+
+			// 4. Finish spawning. This triggers OnConstruction, which creates the MID and applies the radius,
+			// completely preventing any 1-frame visual or collision glitches.
+			MagicCircle->FinishSpawning(MagicCircleTransform);
 		}
 	}
 }
@@ -121,7 +143,8 @@ void AAuraPlayerController::CursorTrace()
 		ThisActor = nullptr;
 		return;
 	}
-	GetHitResultUnderCursor(ECC_Visibility, false, CursorHit);
+	const ECollisionChannel TraceChannel = IsValid(MagicCircle) ? ECC_ExcludePlayers : ECC_Visibility;
+	GetHitResultUnderCursor(TraceChannel, false, CursorHit);
 	if (!CursorHit.bBlockingHit) return;
 
 	LastActor = ThisActor;

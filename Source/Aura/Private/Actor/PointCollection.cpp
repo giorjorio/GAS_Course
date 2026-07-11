@@ -58,7 +58,7 @@ APointCollection::APointCollection()
 
 }
 
-TArray<FTransform> APointCollection::CalculateAndGetGroundPoints(int32 NumPoints,	float YawOverride)
+TArray<FTransform> APointCollection::CalculateAndGetGroundPoints(int32 NumPoints, float YawOverride)
 {
 	checkf(ImmutablePoints.Num() > 0, TEXT("%hs: The number of Points must be greater than 0."), __FUNCTION__);
  
