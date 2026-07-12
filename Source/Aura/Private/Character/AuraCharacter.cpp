@@ -114,6 +114,8 @@ int32 AAuraCharacter::GetSpellPoints_Implementation() const
 
 void AAuraCharacter::ShowMagicCircle_Implementation(UMaterialInstance* DecalMaterial, float Radius)
 {
+	if (!IsLocallyControlled()) return;
+	
 	if (AAuraPlayerController* AuraPlayerController = GetController<AAuraPlayerController>())
 	{
 		AuraPlayerController->ShowMagicCircle(DecalMaterial, Radius);
@@ -123,6 +125,8 @@ void AAuraCharacter::ShowMagicCircle_Implementation(UMaterialInstance* DecalMate
 
 void AAuraCharacter::HideMagicCircle_Implementation()
 {
+	if (!IsLocallyControlled()) return;
+	
 	if (AAuraPlayerController* AuraPlayerController = GetController<AAuraPlayerController>())
 	{
 		AuraPlayerController->HideMagicCircle();
