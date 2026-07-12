@@ -26,6 +26,6 @@ public:
 protected:
 	
 	float GetManaCost(float InLevel = 1.f) const;
-	float GetCoolDown(float InLevel = 1.f) const;
+	float GetCooldown(float InLevel = 1.f) const;
 	
 };

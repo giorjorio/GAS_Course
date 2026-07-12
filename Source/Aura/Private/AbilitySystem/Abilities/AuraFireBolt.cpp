@@ -13,7 +13,7 @@ FString UAuraFireBolt::GetDescription(int32 Level)
 	
 	const int32 ScaledDamage = Damage.GetValueAtLevel(Level);
 	const float ManaCost = FMath::Abs(GetManaCost(Level));
-	const float Cooldown = GetCoolDown(Level);
+	const float Cooldown = GetCooldown(Level);
 	if (Level == 1)
 	{
 		return FString::Printf(TEXT(
@@ -41,11 +41,9 @@ FString UAuraFireBolt::GetDescription(int32 Level)
 			Cooldown,
 			ScaledDamage);
 	}
-	else
-	{
-		return FString::Printf(TEXT(
+	return FString::Printf(TEXT(
 		// Title
-		"<Title>NEXT LEVEL: </>\n\n"
+		"<Title>FIRE BOLT</>\n\n"
 			
 		// Level
 		"<Small>Level: </><Level>%d</>\n"
@@ -63,20 +61,19 @@ FString UAuraFireBolt::GetDescription(int32 Level)
 			
 		"a chance to burn</>\n\n"),
 			
-		// Values
-		Level, 
-		ManaCost, 
-		Cooldown,
-		FMath::Min(Level, MaxNumberOfProjectiles),
-		ScaledDamage);
-	}
+	                       // Values
+	                       Level, 
+	                       ManaCost, 
+	                       Cooldown,
+	                       FMath::Min(Level, MaxNumberOfProjectiles),
+	                       ScaledDamage);
 }
 
 FString UAuraFireBolt::GetNextLevelDescription(int32 NextLevel)
 {
 	const int32 ScaledDamage = Damage.GetValueAtLevel(NextLevel);
 	const float ManaCost = FMath::Abs(GetManaCost(NextLevel));
-	const float Cooldown = GetCoolDown(NextLevel);
+	const float Cooldown = GetCooldown(NextLevel);
 
 	return FString::Printf(TEXT(
 		// Title
