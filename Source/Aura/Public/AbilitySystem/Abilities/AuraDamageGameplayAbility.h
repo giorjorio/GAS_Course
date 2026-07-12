@@ -23,7 +23,14 @@ public:
 	void CauseDamage(AActor* TargetActor);
 	
 	UFUNCTION(BlueprintPure)
-	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+	FDamageEffectParams MakeDamageEffectParamsFromClassDefaults(
+		AActor* TargetActor = nullptr, 
+		bool bOverrideKnockbackDirection = false,
+		FVector KnockbackDirectionOverride = FVector::ZeroVector,
+		bool bOverrideDeathImpulse = false,
+		FVector DeathImpulseDirectionOverride = FVector::ZeroVector,
+		bool bOverridePitch = false,
+		float PitchOverride = 0.f) const;
 	
 	UFUNCTION(BlueprintPure)
 	float GetDamageAtLevel() const;
@@ -73,5 +80,7 @@ protected:
 
 	UFUNCTION(BlueprintPure)
 	FTaggedMontage GetRandomTaggedMontage(const TArray<FTaggedMontage>& TaggedMontages) const;
+	
+	FVector GetImpulseDirection(AActor* TargetActor, const FVector& OverrideOrigin = FVector::ZeroVector, float PitchOverride = 45.f) const;
 	
 };
