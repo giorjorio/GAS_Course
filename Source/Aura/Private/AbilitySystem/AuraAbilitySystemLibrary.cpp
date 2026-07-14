@@ -10,6 +10,7 @@
 #include "AbilitySystem/Data/AbilityInfo.h"
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Engine/DamageEvents.h"
+#include "Game/AuraGameInstance.h"
 #include "Game/AuraGameModeBase.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -202,18 +203,22 @@ bool UAuraAbilitySystemLibrary::IsCharacterBehindCover(const AActor* TargetActor
 
 UCharacterClassInfo* UAuraAbilitySystemLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
 {
-	const AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (AuraGameMode == nullptr) return nullptr;
-
-	return AuraGameMode->CharacterClassInfo;
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
+	if (AuraGameInstance)
+	{
+		return AuraGameInstance->CharacterClassInfo;
+	}
+	return nullptr;
 }
 
 UAbilityInfo* UAuraAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
 {
-	const AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(WorldContextObject));
-	if (AuraGameMode == nullptr) return nullptr;
-
-	return AuraGameMode->AbilityInfo;
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
+	if (AuraGameInstance)
+	{
+		return AuraGameInstance->AbilityInfo;
+	}
+	return nullptr;
 }
 
 bool UAuraAbilitySystemLibrary::IsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)

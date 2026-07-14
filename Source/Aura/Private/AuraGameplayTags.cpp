@@ -162,6 +162,8 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Abilities.Fire"), FString("Fire Abilities Tag"));
 	GameplayTags.Abilities_Fire_Firebolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Abilities.Fire.Firebolt"), FString("Firebolt Ability Tag"));
+	GameplayTags.Abilities_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Abilities.Fire.FireBlast"), FString("FireBlast Ability Tag"));
 	
 	//  Lightning Abilities
 	GameplayTags.Abilities_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
@@ -220,6 +222,8 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 		FName("Cooldown.Fire"), FString("Cooldown Fire Abilities Tag"));
 	GameplayTags.Cooldown_Fire_Firebolt = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Fire.Firebolt"), FString("Cooldown Firebolt Ability Tag"));
+	GameplayTags.Cooldown_Fire_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("Cooldown.Fire.FireBlast"), FString("Cooldown FireBlast Ability Tag"));
 	
 	GameplayTags.Cooldown_Lightning = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Cooldown.Lightning"), FString("Cooldown Lightning Abilities Tag"));

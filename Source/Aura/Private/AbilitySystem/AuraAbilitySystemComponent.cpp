@@ -296,6 +296,7 @@ void UAuraAbilitySystemComponent::ServerEquipAbility_Implementation(const FGamep
 				}
 				
 				ClearSlot(SpecWithSlot);
+				MarkAbilitySpecDirty(*SpecWithSlot); 
 			}
 			
 			if (!AbilityHasAnySlot(*AbilitySpec)) // Ability doesn't yet have a slot (it's not active)

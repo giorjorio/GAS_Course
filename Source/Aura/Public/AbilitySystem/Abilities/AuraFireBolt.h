@@ -25,9 +25,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "Firebolt")
 	float ProjectileSpread = 90.f;
-	
-	
-	
+		
 	UPROPERTY(EditDefaultsOnly, Category = "Firebolt")
 	float HomingAccelerationMin = 1600.f;
 	
