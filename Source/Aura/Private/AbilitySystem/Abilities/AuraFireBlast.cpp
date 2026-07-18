@@ -72,3 +72,8 @@ FString UAuraFireBlast::GetNextLevelDescription(int32 NextLevel)
 
 
 }
+
+TArray<AAuraFireBall*> UAuraFireBlast::SpawnFireBalls()
+{
+	return TArray<AAuraFireBall*>();
+}
