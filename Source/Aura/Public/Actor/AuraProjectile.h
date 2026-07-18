@@ -34,7 +34,6 @@ protected:
 	
 	virtual void Destroyed() override;
 	
-	
 	bool bHit = false;
 	
 	UFUNCTION()
