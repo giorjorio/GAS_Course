@@ -44,6 +44,11 @@ protected:
 	
 	UFUNCTION()
 	void OnHomingTargetDeath(AActor* DeadActor);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TObjectPtr<USphereComponent> Sphere;
+	
+	bool IsValidOverlap(AActor* OtherActor);
 
 private:
 	
@@ -51,8 +56,7 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	float LifeSpan = 15.f;
 	
-	UPROPERTY(VisibleAnywhere)
-	TObjectPtr<USphereComponent> Sphere;
+	
 
 	UPROPERTY(EditAnywhere)
     TObjectPtr<UNiagaraSystem> ImpactEffect;

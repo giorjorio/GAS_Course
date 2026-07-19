@@ -15,10 +15,16 @@ class AURA_API AAuraFireBall : public AAuraProjectile
 	GENERATED_BODY()
 	
 public: 
+	UPROPERTY(BlueprintReadWrite)
+	TSet<AActor*> IgnoreList;
+	
+	UFUNCTION(BlueprintCallable)
+	void EmptyIgnoreList();
 	
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartOutgoingTimeline();
 protected:
+	
 	
 	virtual void BeginPlay() override;
 	virtual void OnSphereOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
