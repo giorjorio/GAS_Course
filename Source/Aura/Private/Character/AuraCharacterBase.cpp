@@ -61,6 +61,14 @@ AAuraCharacterBase::AAuraCharacterBase()
 	
 }
 
+
+void AAuraCharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+
 void AAuraCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -79,12 +87,6 @@ void AAuraCharacterBase::OnRep_Stunned()
 
 void AAuraCharacterBase::OnRep_Burned()
 {
-}
-
-void AAuraCharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
 }
 
 void AAuraCharacterBase::Multicast_ShowDamageText_Implementation(float Damage, bool bBlockedHit, bool bCriticalHit)

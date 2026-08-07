@@ -91,15 +91,16 @@ TArray<AAuraFireBall*> UAuraFireBlast::SpawnFireBalls()
 	for (const FRotator& Rotator : Rotators)
 	{
 		SpawnTransform.SetRotation(Rotator.Quaternion());
-		
+		AActor* AvatarActor = GetAvatarActorFromActorInfo();
 		AAuraFireBall* FireBall = GetWorld()->SpawnActorDeferred<AAuraFireBall>(
 			FireBallClass,
 			SpawnTransform,
-			GetOwningActorFromActorInfo(),
-			CurrentActorInfo->PlayerController->GetPawn(),
+			AvatarActor,
+			Cast<APawn>(AvatarActor),
 			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		
 		FireBall->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+		FireBall->ExplosionDamageParams = MakeDamageEffectParamsFromClassDefaults();
 		
 		FireBalls.Add(FireBall);
 		

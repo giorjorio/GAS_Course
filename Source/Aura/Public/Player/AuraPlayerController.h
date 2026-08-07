@@ -146,7 +146,7 @@ private:
 	TObjectPtr<AMagicCircle> MagicCircle;
 
 	
-	 void UpdateMagicCircleLocation();
+	void UpdateMagicCircleLocation();
 
 };
 
