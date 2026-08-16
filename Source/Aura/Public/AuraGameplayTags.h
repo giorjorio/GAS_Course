@@ -147,6 +147,9 @@ public:
 	FGameplayTag Player_Block_InputHeld;
 	FGameplayTag Player_Block_InputPressed;
 	FGameplayTag Player_Block_InputReleased;
+	
+	/* Gameplay Cue Tags */
+	FGameplayTag GameplayCue_FireBlast;
 
 
 	

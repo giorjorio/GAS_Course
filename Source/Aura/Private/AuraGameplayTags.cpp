@@ -265,6 +265,11 @@ void FAuraGameplayTags::InitializeNativeGameplayTags()
 	GameplayTags.Montage_Attack_4 = UGameplayTagsManager::Get().AddNativeGameplayTag(
 		FName("Montage.Attack.4"), FString("Attack 4"));
 
+	/*
+	 * Gameplay Cue Tags
+	 */
+	GameplayTags.GameplayCue_FireBlast = UGameplayTagsManager::Get().AddNativeGameplayTag(
+		FName("GameplayCue.FireBlast"), FString("GameplayCue FireBlast Tag"));
 	
 	/*
 	 * Input Tags
