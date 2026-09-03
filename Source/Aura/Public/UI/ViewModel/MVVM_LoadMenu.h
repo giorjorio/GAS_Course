@@ -34,6 +34,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<UMVVM_LoadSlot> LoadSlotViewModelClass;
 	
+	void LoadData();
+	
 	
 private:
 	
