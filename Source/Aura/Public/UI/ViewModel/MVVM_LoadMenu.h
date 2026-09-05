@@ -6,6 +6,10 @@
 #include "MVVMViewModelBase.h"
 #include "MVVM_LoadMenu.generated.h"
 
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSlotSelected);
+
+
 class UMVVM_LoadSlot;
 /**
  * 
@@ -18,6 +22,9 @@ class AURA_API UMVVM_LoadMenu : public UMVVMViewModelBase
 public:
 	
 	void InitializeLoadSlots();
+	
+	UPROPERTY(BlueprintAssignable)
+	FSlotSelected SlotSelected;
 	
 	UFUNCTION(BlueprintPure)
 	UMVVM_LoadSlot* GetLoadSlotViewModelByIndex(int32 Index);
