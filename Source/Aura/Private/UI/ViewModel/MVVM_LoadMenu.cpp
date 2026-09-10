@@ -23,6 +23,8 @@ void UMVVM_LoadMenu::InitializeLoadSlots()
 	LoadSlot_2->SetLoadSlotName(FString("LoadSlot_2"));
 	LoadSlot_2->SlotIndex = 2;
 	LoadSlots.Add(2, LoadSlot_2);
+	
+	SetNumLoadSlots(LoadSlots.Num());
 }
 
 UMVVM_LoadSlot* UMVVM_LoadMenu::GetLoadSlotViewModelByIndex(int32 Index)
@@ -35,6 +37,7 @@ void UMVVM_LoadMenu::NewSlotButtonPressed(int32 Slot, const FString& EnteredName
 {
 	AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
 	
+	LoadSlots[Slot]->SetMapName(AuraGameMode->DefaultMapName);
 	LoadSlots[Slot]->SetPlayerName(EnteredName);
 	LoadSlots[Slot]->SlotStatus = Taken;
 	
@@ -90,4 +93,9 @@ void UMVVM_LoadMenu::LoadData()
 		LoadSlot.Value->SetPlayerName(PlayerName);
 		LoadSlot.Value->InitializeSlot();
 	}
+}
+
+void UMVVM_LoadMenu::SetNumLoadSlots(const int32& InNumLoadSlots)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(NumLoadSlots, InNumLoadSlots);
 }

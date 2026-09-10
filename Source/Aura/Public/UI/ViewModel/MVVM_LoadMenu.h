@@ -46,6 +46,9 @@ public:
 	
 	void LoadData();
 	
+	int32 GetNumLoadSlots() const {return NumLoadSlots;};
+	void SetNumLoadSlots(const int32& InNumLoadSlots);
+	
 	
 private:
 	
@@ -63,4 +66,7 @@ private:
 	
 	UPROPERTY()
 	TObjectPtr<UMVVM_LoadSlot> SelectedSlot;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Setter, Getter, meta = (AllowPrivateAccess = "true"))
+	int32 NumLoadSlots;
 };
