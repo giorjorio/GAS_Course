@@ -46,6 +46,9 @@ public:
 	
 	void LoadData();
 	
+	UFUNCTION(BlueprintCallable)
+	void PlayButtonPressed();
+	
 	int32 GetNumLoadSlots() const {return NumLoadSlots;};
 	void SetNumLoadSlots(const int32& InNumLoadSlots);
 	
