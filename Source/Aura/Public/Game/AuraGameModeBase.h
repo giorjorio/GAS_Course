@@ -29,7 +29,7 @@ public:
 	void TravelToMap(UMVVM_LoadSlot* Slot);
 	
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<USaveGame> LoadScreenSaveGameClass;
+	TSubclassOf<USaveGame> LoadMenuSaveGameClass;
 	
 	UPROPERTY(EditDefaultsOnly)
 	FString DefaultMapName;
