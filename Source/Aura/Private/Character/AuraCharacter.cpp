@@ -13,6 +13,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
+#include "Game/AuraGameInstance.h"
+#include "Game/AuraGameModeBase.h"
+#include "Game/LoadMenuSaveGame.h"
 #include "Player/AuraPlayerController.h"
 #include "Player/AuraPlayerState.h"
 #include "UI/HUD/AuraHUD.h"
@@ -132,6 +135,20 @@ void AAuraCharacter::HideMagicCircle_Implementation()
 		AuraPlayerController->HideMagicCircle();
 		AuraPlayerController->bShowMouseCursor = true;
 
+	}
+}
+
+void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
+{
+	AAuraGameModeBase* AuraGameMode = Cast<AAuraGameModeBase>(UGameplayStatics::GetGameMode(this));
+	if (AuraGameMode)
+	{
+		ULoadMenuSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
+		if (SaveData == nullptr) return;
+		
+		SaveData->PlayerStartTag = CheckpointTag;
+		
+		AuraGameMode->SaveInGameProgressData(SaveData);
 	}
 }
 
