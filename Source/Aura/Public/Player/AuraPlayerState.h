@@ -15,6 +15,8 @@ class ULevelUpInfo;
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnPlayerStatChanged, int32 /*StatValue*/);
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnLevelChanged, int32 /*StatValue*/, bool /*bLevelUp*/);
+
 
 /**
  * 
@@ -46,7 +48,7 @@ public:
 	TObjectPtr<ULevelUpInfo> LevelUpInfo;
 
 	FOnPlayerStatChanged OnXPChangedDelegate;
-	FOnPlayerStatChanged OnLevelChangedDelegate;
+	FOnLevelChanged OnLevelChangedDelegate;
 	FOnPlayerStatChanged OnAttributePointsChangedDelegate;
 	FOnPlayerStatChanged OnSpellPointsChangedDelegate;
 	
@@ -55,7 +57,7 @@ public:
 	FORCEINLINE int32 GetAttributePoints() const { return AttributePoints; }
 	FORCEINLINE int32 GetSpellPoints() const { return SpellPoints; }
 	
-	void SetLevel(int32 InLevel);
+	void SetLevel(int32 InLevel); // for loading from disc
 	void SetXP(int32 InXP);
 	void SetAttributePoints(int32 InAttributePoints);
 	void SetSpellPoints(int32 InSpellPoints);

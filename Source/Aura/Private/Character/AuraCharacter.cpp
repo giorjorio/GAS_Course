@@ -12,9 +12,9 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
+#include "AbilitySystem/AuraAbilitySystemLibrary.h"
 #include "AbilitySystem/AuraAttributeSet.h"
 #include "AbilitySystem/Debuff/DebuffNiagaraComponent.h"
-#include "Game/AuraGameInstance.h"
 #include "Game/AuraGameModeBase.h"
 #include "Game/LoadMenuSaveGame.h"
 #include "Player/AuraPlayerController.h"
@@ -57,11 +57,6 @@ void AAuraCharacter::PossessedBy(AController* NewController)
 	InitAbilityActorInfo();
 	LoadProgress();
 	
-	
-	//TODO: Load in Abilities from disc
-	AddCharacterAbilities();
-	
-	
 }
 
 void AAuraCharacter::LoadProgress()
@@ -72,14 +67,6 @@ void AAuraCharacter::LoadProgress()
 		ULoadMenuSaveGame* SaveData = AuraGameMode->RetrieveInGameSaveData();
 		if (SaveData == nullptr) return;
 		
-		if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
-		{
-			AuraPlayerState->SetLevel(SaveData->PlayerLevel);
-			AuraPlayerState->SetXP(SaveData->XP);
-			AuraPlayerState->SetAttributePoints(SaveData->AttributePoints);
-			AuraPlayerState->SetSpellPoints(SaveData->SpellPoints);
-		}
-		
 		if (SaveData->bFirstTimeLoadIn)
 		{
 			InitializeDefaultAttributes();
@@ -87,7 +74,17 @@ void AAuraCharacter::LoadProgress()
 		}
 		else
 		{
+			//TODO: Load in Abilities from disc
+
+			if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
+			{
+				AuraPlayerState->SetLevel(SaveData->PlayerLevel);
+				AuraPlayerState->SetXP(SaveData->XP);
+				AuraPlayerState->SetAttributePoints(SaveData->AttributePoints);
+				AuraPlayerState->SetSpellPoints(SaveData->SpellPoints);
+			}
 			
+			UAuraAbilitySystemLibrary::InitializeDefaultAttributesFromSaveData(this, AbilitySystemComponent, SaveData);
 		}
 	}
 }
@@ -297,7 +294,7 @@ void AAuraCharacter::InitAbilityActorInfo()
 	}
 
 
-	AuraPlayerState->OnLevelChangedDelegate.AddLambda([this](const int32 NewValue)
+	AuraPlayerState->OnLevelChangedDelegate.AddLambda([this](const int32 NewValue, const bool bLevelUp)
 	{
 		Multicast_LevelUpVFX();
 	});
