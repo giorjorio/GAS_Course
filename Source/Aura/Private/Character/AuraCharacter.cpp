@@ -75,8 +75,10 @@ void AAuraCharacter::LoadProgress()
 		}
 		else
 		{
-			//TODO: Load in Abilities from disc
-
+			if (UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent))
+			{
+				AuraASC->AddCharacterAbilitiesFromSaveData(SaveData);
+			}
 			if (AAuraPlayerState* AuraPlayerState = Cast<AAuraPlayerState>(GetPlayerState()))
 			{
 				AuraPlayerState->SetLevel(SaveData->PlayerLevel);
@@ -197,6 +199,7 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		
 		UAuraAbilitySystemComponent* AuraASC = Cast<UAuraAbilitySystemComponent>(AbilitySystemComponent);
 		FForEachAbility SaveAbilityDelegate;
+		SaveData->SavedAbilities.Empty();
 		SaveAbilityDelegate.BindLambda([this, AuraASC, SaveData](const FGameplayAbilitySpec& AbilitySpec)
 		{
 			const FGameplayTag AbilityTag = AuraASC->GetAbilityTagFromSpec(AbilitySpec);
@@ -211,7 +214,7 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 			SavedAbility.AbilityStatus = AuraASC->GetStatusFromAbilityTag(AbilityTag);
 			SavedAbility.AbilityType = Info.AbilityType;
 			
-			SaveData->SavedAbilities.Add(SavedAbility);
+			SaveData->SavedAbilities.AddUnique(SavedAbility);
 			
 		});
 		AuraASC->ForEachAbility(SaveAbilityDelegate);
@@ -321,7 +324,11 @@ void AAuraCharacter::InitAbilityActorInfo()
 
 	AuraPlayerState->OnLevelChangedDelegate.AddLambda([this](const int32 NewValue, const bool bLevelUp)
 	{
-		Multicast_LevelUpVFX();
+		if (bLevelUp)
+		{
+			Multicast_LevelUpVFX();
+		}
+		
 	});
 }
 

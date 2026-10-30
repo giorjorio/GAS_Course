@@ -73,6 +73,14 @@ void AAuraGameModeBase::SaveInGameProgressData(ULoadMenuSaveGame* SaveObject)
 	UGameplayStatics::SaveGameToSlot(SaveObject, InGameLoadSlotName, InGameLoadSlotIndex);
 }
 
+/*void AAuraGameModeBase::SaveWorldState()
+{
+	ULoadMenuSaveGame* SaveObject = RetrieveInGameSaveData();
+	if (!IsValid(SaveObject)) return;
+	SaveObject->SaveActors.Append(SaveActors);
+	SaveInGameProgressData(SaveObject);
+}*/
+
 void AAuraGameModeBase::TravelToMap(UMVVM_LoadSlot* Slot)
 {
 	const FString SlotName = Slot->GetLoadSlotName();
