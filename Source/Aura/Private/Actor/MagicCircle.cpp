@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Interaction/EnemyInterface.h"
+#include "Interaction/HighlightInterface.h"
 
 AMagicCircle::AMagicCircle()
 {
@@ -65,7 +66,7 @@ void AMagicCircle::OnConstruction(const FTransform& Transform)
 void AMagicCircle::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (IEnemyInterface* Enemy = Cast<IEnemyInterface>(OtherActor))
+	if (IHighlightInterface* Enemy = Cast<IHighlightInterface>(OtherActor))
 	{
 		Enemy->HighlightActor();
 	}
@@ -74,7 +75,7 @@ void AMagicCircle::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent
 void AMagicCircle::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (IEnemyInterface* Enemy = Cast<IEnemyInterface>(OtherActor))
+	if (IHighlightInterface* Enemy = Cast<IHighlightInterface>(OtherActor))
 	{
 		Enemy->UnHighlightActor();
 	}

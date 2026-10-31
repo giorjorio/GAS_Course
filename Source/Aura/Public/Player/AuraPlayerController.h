@@ -13,7 +13,7 @@ class UNiagaraSystem;
 class UAuraAbilitySystemComponent;
 class UAuraInputConfig;
 class UDamageTextComponent;
-class IEnemyInterface;
+class IHighlightInterface;
 class UInputAction;
 class UInputMappingContext;
 class UNavigationSystemV1;
@@ -59,8 +59,8 @@ private:
 
 	void CursorTrace();
 	
-	TScriptInterface<IEnemyInterface> LastActor;
-	TScriptInterface<IEnemyInterface> ThisActor;
+	TScriptInterface<IHighlightInterface> LastActor;
+	TScriptInterface<IHighlightInterface> ThisActor;
 	
 	/*
 	 * Movement
