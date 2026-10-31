@@ -402,6 +402,15 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 			GetHitResultUnderCursor(ECC_Navigation, false, NavChannelCursorHitResult);
 			if (NavChannelCursorHitResult.bBlockingHit)
 			{
+				// By default, use the cursor hit location on the Navigation channel.
+				FVector DesiredDestination = NavChannelCursorHitResult.ImpactPoint;
+				// Allow the hovered actor to override the destination with its approach location.
+				// DesiredDestination is passed by reference so the actor can modify it.
+				const bool bClickedObject = IsValid(ThisActor) && ThisActor->Implements<UHighlightInterface>();
+				if (bClickedObject)
+				{
+					IHighlightInterface::Execute_SetMoveToLocation(ThisActor, DesiredDestination);
+				}
 				// Projecting a point from the cursor impact point to the NavMesh with a larger-than-default
 				// Query Extent, so there are better chances to reach for the NavMesh and return a point,
 				// then generating a path from the pawn location to this point (only if found).
@@ -409,7 +418,13 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 				FNavLocation ImpactPointNavLocation;
 				// NOTE: Default Query Extend = FVector(50.0f, 50.0f, 250.0f)
 				const FNavAgentProperties& NavAgentProps = GetNavAgentPropertiesRef();
-				const bool bNavLocationFound = NavSystem->ProjectPointToNavigation(NavChannelCursorHitResult.ImpactPoint, ImpactPointNavLocation, QueryingExtend, &NavAgentProps);
+				// Project the chosen destination onto the NavMesh.
+				// Use the resulting ImpactPointNavLocation to build the path and spline.
+				const bool bNavLocationFound = NavSystem->ProjectPointToNavigation(
+					DesiredDestination,
+					ImpactPointNavLocation,
+					QueryingExtend,
+					&NavAgentProps);
 
 				if (bNavLocationFound)
 				{
@@ -435,8 +450,10 @@ void AAuraPlayerController::AbilityInputTagReleased(FGameplayTag InputTag)
 						{
 							bAutoRunning = false;
 						}
+						
 						const FVector FinalDestination = NavPath->PathPoints.Last();
-						if (GetASC() && !GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
+						// Show the movement marker only for regular ground clicks, after a valid path has been found.
+						if ( !bClickedObject && GetASC() && !GetASC()->HasMatchingGameplayTag(FAuraGameplayTags::Get().Player_Block_InputPressed))
 						{
 							UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagaraSystem, FinalDestination);
 						}
