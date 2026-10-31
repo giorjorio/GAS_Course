@@ -26,3 +26,26 @@ bool ULoadMenuSaveGame::HasMap(const FString& InMapName)
 	}
 	return false;
 }
+
+/*
+bool ULoadMenuSaveGame::HasMap(const FString& InMapName) const
+{
+	return SavedMaps.ContainsByPredicate(
+		[&InMapName](const FSavedMap& Map)
+		{
+			return Map.MapAssetName == InMapName;
+		});
+}
+
+FSavedMap ULoadMenuSaveGame::GetSavedMapWithMapName(
+	const FString& InMapName) const
+{
+	const FSavedMap* FoundMap = SavedMaps.FindByPredicate(
+		[&InMapName](const FSavedMap& Map)
+		{
+			return Map.MapAssetName == InMapName;
+		});
+
+	return FoundMap ? *FoundMap : FSavedMap();
+}
+*/
