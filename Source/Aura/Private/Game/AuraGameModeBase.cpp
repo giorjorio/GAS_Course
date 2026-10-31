@@ -4,6 +4,7 @@
 #include "Game/AuraGameModeBase.h"
 
 #include "EngineUtils.h"
+#include "Aura/AuraLogChannels.h"
 #include "Game/AuraGameInstance.h"
 #include "Game/LoadMenuSaveGame.h"
 #include "GameFramework/PlayerStart.h"
@@ -78,7 +79,7 @@ void AAuraGameModeBase::SaveInGameProgressData(ULoadMenuSaveGame* SaveObject)
 
 
 
-void AAuraGameModeBase::SaveWorldState(UWorld* World)
+void AAuraGameModeBase::SaveWorldState(UWorld* World) const
 {
 	FString WorldName = World->GetMapName();
 	WorldName.RemoveFromStart(World->StreamingLevelsPrefix);
@@ -126,6 +127,51 @@ void AAuraGameModeBase::SaveWorldState(UWorld* World)
 			}
 		}
 		UGameplayStatics::SaveGameToSlot(SaveGame, AuraGI->LoadSlotName, AuraGI->LoadSlotIndex);
+	}
+}
+
+void AAuraGameModeBase::LoadWorldState(UWorld* World) const
+{
+	FString WorldName = World->GetMapName();
+	WorldName.RemoveFromStart(World->StreamingLevelsPrefix);
+	
+	UAuraGameInstance* AuraGI = Cast<UAuraGameInstance>(GetGameInstance());
+	check(AuraGI);
+	
+	if (UGameplayStatics::DoesSaveGameExist(AuraGI->LoadSlotName, AuraGI->LoadSlotIndex))
+	{
+		
+		ULoadMenuSaveGame* SaveGame = Cast<ULoadMenuSaveGame>(UGameplayStatics::LoadGameFromSlot(AuraGI->LoadSlotName, AuraGI->LoadSlotIndex));
+		if (SaveGame == nullptr)
+		{
+			UE_LOG(LogAura, Error, TEXT("Failed to load Slot"));
+			return;
+		}
+		
+		for (FActorIterator It(World); It; ++It)
+		{
+			AActor* Actor = *It;
+			
+			if (!Actor->Implements<USaveInterface>()) continue;
+			
+			for (FSavedActor SavedActor : SaveGame->GetSavedMapWithMapName(WorldName).SavedActors)
+			{
+				if (SavedActor.ActorName == Actor->GetFName())
+				{
+					if (ISaveInterface::Execute_ShouldLoadTransform(Actor))
+					{
+						Actor->SetActorTransform(SavedActor.Transform);
+					}
+					FMemoryReader MemoryReader(SavedActor.Bytes);
+					
+					FObjectAndNameAsStringProxyArchive Archive(MemoryReader, true);
+					Archive.ArIsSaveGame = true;
+					Actor->Serialize(Archive); // converts binary bytes back into variables
+					
+					ISaveInterface::Execute_LoadActor(Actor);
+				}
+			}
+		}
 	}
 }
 
