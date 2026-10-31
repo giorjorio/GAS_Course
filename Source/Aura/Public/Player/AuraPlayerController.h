@@ -20,6 +20,13 @@ class UNavigationSystemV1;
 class USplineComponent;
 struct FInputActionValue;
 
+enum class ETargetingStatus: uint8
+{
+	TargetingEnemy,
+	TargetingNonEnemy,
+	NotTargeting
+};
+
 
 /**
  * 
@@ -57,10 +64,15 @@ private:
 
 	FHitResult CursorHit;
 
-	void CursorTrace();
+	TObjectPtr<AActor> LastActor;
+	TObjectPtr<AActor> ThisActor;
 	
-	TScriptInterface<IHighlightInterface> LastActor;
-	TScriptInterface<IHighlightInterface> ThisActor;
+	
+	void CursorTrace();
+	static void HighlightActor(AActor* InActor);
+	static void UnHighlightActor(AActor* InActor);
+	
+	
 	
 	/*
 	 * Movement
@@ -104,7 +116,7 @@ private:
 	bool GetScreenPositionPlaneIntersection(const FVector2d& ScreenPosition, const FVector& InPlaneOrigin, const FVector& InPlaneNormal, FVector& OutPlanePoint) const;
 	
 	bool bAutoRunning = false;
-	bool bTargeting = false;
+	ETargetingStatus TargetingStatus =  ETargetingStatus::NotTargeting;
 	float ControlledPawnHalfHeight = 0.0f;
 	float FollowTime = 0.f;
 	float ShortPressThreshold = 0.5f;
