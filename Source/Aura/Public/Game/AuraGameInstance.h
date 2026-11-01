@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "AuraGameInstance.generated.h"
 
+class ULootTiers;
 class UAbilityInfo;
 class UCharacterClassInfo;
 /**
@@ -21,6 +22,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Ability Info")
 	TObjectPtr<UAbilityInfo> AbilityInfo;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Loot Tiers")
+	TObjectPtr<ULootTiers> LootTiers;
 	
 	UPROPERTY()
 	FName PlayerStartTag = FName();

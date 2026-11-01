@@ -11,7 +11,6 @@
 #include "AbilitySystem/Data/CharacterClassInfo.h"
 #include "Engine/DamageEvents.h"
 #include "Game/AuraGameInstance.h"
-#include "Game/AuraGameModeBase.h"
 #include "Game/LoadMenuSaveGame.h"
 #include "Interaction/CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -290,6 +289,16 @@ UAbilityInfo* UAuraAbilitySystemLibrary::GetAbilityInfo(const UObject* WorldCont
 	if (AuraGameInstance)
 	{
 		return AuraGameInstance->AbilityInfo;
+	}
+	return nullptr;
+}
+
+ULootTiers* UAuraAbilitySystemLibrary::GetLootTiers(const UObject* WorldContextObject)
+{
+	UAuraGameInstance* AuraGameInstance = Cast<UAuraGameInstance>(UGameplayStatics::GetGameInstance(WorldContextObject));
+	if (AuraGameInstance)
+	{
+		return AuraGameInstance->LootTiers;
 	}
 	return nullptr;
 }
@@ -657,7 +666,7 @@ FGameplayEffectContextHandle UAuraAbilitySystemLibrary::ApplyDamageEffect(const 
 	
 }
 
-TArray<FRotator> UAuraAbilitySystemLibrary::EvenlySpaceRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumRotators)
+TArray<FRotator> UAuraAbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, float Spread, int32 NumRotators)
 {
 	TArray<FRotator> Rotators;
 	
