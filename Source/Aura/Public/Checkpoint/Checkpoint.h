@@ -63,10 +63,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void HandleGlowEffects();
 	
-	
-private:
-	
-	
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<USphereComponent> Sphere;
 	
