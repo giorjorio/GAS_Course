@@ -66,17 +66,17 @@ void AMagicCircle::OnConstruction(const FTransform& Transform)
 void AMagicCircle::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (IHighlightInterface* Enemy = Cast<IHighlightInterface>(OtherActor))
+	if (IsValid(OtherActor) &&	OtherActor->Implements<UHighlightInterface>())
 	{
-		Enemy->HighlightActor();
+		IHighlightInterface::Execute_HighlightActor(OtherActor);
 	}
 }
 
 void AMagicCircle::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (IHighlightInterface* Enemy = Cast<IHighlightInterface>(OtherActor))
+	if (IsValid(OtherActor) && OtherActor->Implements<UHighlightInterface>())
 	{
-		Enemy->UnHighlightActor();
+		IHighlightInterface::Execute_UnHighlightActor(OtherActor);
 	}
 }

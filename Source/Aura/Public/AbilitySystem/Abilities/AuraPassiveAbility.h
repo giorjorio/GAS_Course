@@ -18,4 +18,13 @@ public:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	
 	void ReceiveDeactivate(const FGameplayTag& AbilityTag);
+	
+	virtual FString GetDescription(int32 Level) override;
+	virtual FString GetNextLevelDescription(int32 NextLevel) override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Description")
+	FString PassiveDisplayName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Description", meta = (MultiLine = "true"))
+	FString PassiveDescription;
 };

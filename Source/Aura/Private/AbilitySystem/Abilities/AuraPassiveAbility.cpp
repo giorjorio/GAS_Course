@@ -27,3 +27,23 @@ void UAuraPassiveAbility::ReceiveDeactivate(const FGameplayTag& AbilityTag)
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 	}
 }
+
+FString UAuraPassiveAbility::GetDescription(int32 Level)
+{
+	return FString::Printf(TEXT(
+		"<Title>%s</>\n\n"
+		"<Small>Level: </><Level>%d</>\n\n"
+		"<Default>%s</>\n\n"
+		"<Small>WORK IN PROGRESS - VISUAL ONLY</>\n"
+		"<Small>Gameplay effect is not implemented yet.</>"),
+		*PassiveDisplayName,
+		Level,
+		*PassiveDescription);
+}
+
+FString UAuraPassiveAbility::GetNextLevelDescription(int32 NextLevel)
+{
+	return TEXT(
+		"<Default>Passive upgrades are under development. "
+		"Leveling this ability currently provides no gameplay bonus.</>");
+}

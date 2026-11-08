@@ -214,6 +214,8 @@ void AAuraCharacter::SaveProgress_Implementation(const FName& CheckpointTag)
 		SaveData->Intelligence = UAuraAttributeSet::GetIntelligenceAttribute().GetNumericValue(GetAttributeSet());
 		SaveData->Resilience = UAuraAttributeSet::GetResilienceAttribute().GetNumericValue(GetAttributeSet());
 		SaveData->Vigor = UAuraAttributeSet::GetVigorAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Health = UAuraAttributeSet::GetHealthAttribute().GetNumericValue(GetAttributeSet());
+		SaveData->Mana = UAuraAttributeSet::GetManaAttribute().GetNumericValue(GetAttributeSet());
 		
 		SaveData->bFirstTimeLoadIn = false;
 		
